@@ -634,7 +634,7 @@
   episodesDesc.forEach(function(e){
     var opt = document.createElement('option');
     opt.value = e.peak_date;
-    opt.textContent = e.peak_date + ' — ' + LEVEL_LABEL[e.peak_level] + ' (' + fmtNum(e.peak_discharge,0) + ' m³/s)';
+    opt.textContent = e.peak_date + ' - ' + LEVEL_LABEL[e.peak_level] + ' (' + fmtNum(e.peak_discharge,0) + ' m³/s)';
     jumpSelect.appendChild(opt);
   });
   jumpSelect.addEventListener('change', function(){
@@ -1030,7 +1030,7 @@
       body.innerHTML = '<div class="card live-missing">'+
         '<span>No live snapshot has been fetched yet.</span>'+
         '<span>Run <code>python live_fetch.py</code> in the EWS_System folder, then rebuild with '+
-        '<code>python build_dashboard.py</code> — or set up the scheduled task so this happens automatically every 30 minutes.</span>'+
+        '<code>python build_dashboard.py</code>, or set up the scheduled task so this happens automatically every 30 minutes.</span>'+
       '</div>';
       return;
     }
@@ -1051,7 +1051,7 @@
       var pillText = !triggered ? 'Below trigger'
         : (r.trigger_is_forecast ? 'Forecast to trigger' : 'Trigger reached');
       rc.innerHTML =
-        '<div class="live-card-head"><span class="live-card-title">Rainfall — catchment centroid</span>'+
+        '<div class="live-card-head"><span class="live-card-title">Rainfall, catchment outlet</span>'+
         '<span class="trigger-pill '+pillClass+'">'+pillText+'</span></div>'+
         '<div class="rolling-readout"><span class="num">'+r.rolling_24h_mm.toFixed(1)+'<span style="font-size:14px;">mm</span></span>'+
         '<span class="of">/ ' + r.trigger_threshold_mm_24h.toFixed(0) + 'mm trailing 24h trigger'+
@@ -1073,12 +1073,14 @@
       var g = LIVE.geoglows;
       var lastPct = g.forecast.length ? g.forecast[g.forecast.length-1].pct : null;
       gc.innerHTML =
-        '<div class="live-card-head"><span class="live-card-title">Discharge forecast — nearest reach (proxy)</span></div>'+
+        '<div class="live-card-head"><span class="live-card-title">Discharge forecast, nearest reach (proxy)</span></div>'+
         '<div class="chart-wrap"><canvas id="liveGeoChart" height="110"></canvas><div class="tooltip" id="liveGeoTooltip"></div></div>'+
-        '<div class="proxy-note"><b>Not the Barnawa outlet.</b> Nearest GEOGloWS-mapped reach is ~'+g.distance_km+'km away on a '+
-        'visibly smaller stream (retrospective mean '+g.retrospective_mean+' m&sup3;/s over '+g.retrospective_years+' simulated years, '+
-        'vs. Barnawa\'s observed ~169 m&sup3;/s mean). Values here are not comparable to the Advisory/Watch/Warning/Severe thresholds above — '+
-        'shown only as a rough wet/dry trend cross-check'+(lastPct!=null?' (currently ~'+lastPct+'th percentile of its own record)':'')+'.</div>';
+        '<div class="proxy-note"><b>Proxy reach, not confirmed identical to the calibration input.</b> Nearest GEOGloWS-mapped reach to the '+
+        'documented outlet (10.4700&deg;N, 7.4500&deg;E) is ~'+g.distance_km+'km away. Its retrospective record closely matches Barnawa\'s '+
+        'observed discharge (mean '+g.retrospective_mean+' m&sup3;/s over '+g.retrospective_years+' simulated years, vs. Barnawa\'s observed '+
+        '~169 m&sup3;/s mean), consistent with this study\'s streamflow record itself being GEOGloWS reanalysis. It is not confirmed to be the '+
+        'identical reach used for calibration, so it is shown as a trend indicator rather than classified against the Advisory/Watch/Warning/Severe '+
+        'thresholds above'+(lastPct!=null?' (currently ~'+lastPct+'th percentile of its own record)':'')+'.</div>';
     } else {
       gc.innerHTML = '<div class="live-card-title">Discharge forecast</div><div class="proxy-note">Unavailable this fetch'+(LIVE.error?': '+LIVE.error:'')+'.</div>';
     }

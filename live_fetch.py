@@ -10,12 +10,15 @@ EWS_System/live_data.json:
      logic used for the 2012/2022 historical case studies.
 
   2. Discharge (GEOGloWS v2 API) for the nearest mapped global forecast
-     reach - river_id 140632883, ~5.3 km from the catchment centroid
-     (looked up once via /api/v2/getriverid). This is NOT the Barnawa
-     outlet and is on a visibly smaller stream (retrospective mean ~18
-     m3/s vs Barnawa's observed ~169 m3/s) so it is reported only as a
-     qualitative trend/percentile against its own 86-year simulated
-     record, never against the Barnawa Gumbel thresholds.
+     reach to the catchment's documented outlet (10.4700 N, 7.4500 E,
+     Table 3.1) - river_id 140653280, ~5.5 km away (looked up once via
+     /api/v2/getriverid). Its 86-year retrospective mean (163.8 m3/s) and
+     max (3,976 m3/s) closely match Barnawa's observed record (~169 m3/s
+     mean, 3,497 m3/s max in 2004), consistent with this study's own
+     streamflow record being GEOGloWS-derived reanalysis (Section 4.7) -
+     but it is not confirmed to be the identical reach/segment used for
+     that record, so it is still reported as a proxy, not classified
+     against the Barnawa Gumbel thresholds directly.
 
 Run on a schedule (see setup_scheduled_task.ps1) or manually. Safe to
 run with no internet: writes a status:"error" record instead of crashing,
@@ -27,9 +30,9 @@ import math
 import urllib.request
 from datetime import datetime, timezone
 
-LAT, LON = 10.634, 7.753
-GEOGLOWS_RIVER_ID = 140632883
-GEOGLOWS_DIST_KM = 5.3
+LAT, LON = 10.4700, 7.4500
+GEOGLOWS_RIVER_ID = 140653280
+GEOGLOWS_DIST_KM = 5.5
 RAIN_TRIGGER_MM_24H = 20.0
 OUT_PATH = "live_data.json"
 TIMEOUT = 20
