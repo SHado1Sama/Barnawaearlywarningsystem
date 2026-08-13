@@ -1,0 +1,1215 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta http-equiv="refresh" content="1800">
+<title>Barnawa Early Warning System</title>
+<meta name="description" content="Historical replay and threshold-monitoring instrument for the Barnawa catchment, Kaduna, built from a 36-year Gumbel frequency analysis of daily streamflow.">
+<style>
+  @font-face{
+    font-family:'Archivo';font-style:normal;font-weight:700 900;font-display:swap;
+    src:url(data:font/woff2;base64,__ARCHIVO_B64__) format('woff2');
+  }
+  @font-face{
+    font-family:'Public Sans';font-style:normal;font-weight:400 700;font-display:swap;
+    src:url(data:font/woff2;base64,__PUBLICSANS_B64__) format('woff2');
+  }
+  @font-face{
+    font-family:'IBM Plex Mono';font-style:normal;font-weight:400;font-display:swap;
+    src:url(data:font/woff2;base64,__PLEXMONO400_B64__) format('woff2');
+  }
+  @font-face{
+    font-family:'IBM Plex Mono';font-style:normal;font-weight:500;font-display:swap;
+    src:url(data:font/woff2;base64,__PLEXMONO500_B64__) format('woff2');
+  }
+  @font-face{
+    font-family:'IBM Plex Mono';font-style:normal;font-weight:600;font-display:swap;
+    src:url(data:font/woff2;base64,__PLEXMONO600_B64__) format('woff2');
+  }
+
+  :root{
+    --ink:#101b22;
+    --ink-soft:#44565d;
+    --ink-faint:#7c8b90;
+    --surface:#e9ebe1;
+    --surface-raised:#f6f7f1;
+    --surface-sunken:#dfe2d6;
+    --line:rgba(16,27,34,0.14);
+    --line-strong:rgba(16,27,34,0.26);
+    --accent:#0e7c86;
+    --accent-deep:#0a5960;
+    --accent-soft:rgba(14,124,134,0.14);
+    --on-accent:#f6f7f1;
+
+    --status-normal:#0c8f2f;
+    --status-normal-soft:rgba(12,143,47,0.14);
+    --status-advisory:#a9740b;
+    --status-advisory-soft:rgba(201,148,15,0.18);
+    --status-watch:#c1591c;
+    --status-watch-soft:rgba(193,89,28,0.16);
+    --status-warning:#b3311c;
+    --status-warning-soft:rgba(179,49,28,0.16);
+    --status-severe:#7a1f1f;
+    --status-severe-soft:rgba(122,31,31,0.18);
+
+    --rain:#3a7fb3;
+    --shadow:0 1px 2px rgba(16,27,34,0.06), 0 8px 24px -12px rgba(16,27,34,0.18);
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#eef1ea;
+      --ink-soft:#b7c2c1;
+      --ink-faint:#7f8d8c;
+      --surface:#0b1417;
+      --surface-raised:#111c20;
+      --surface-sunken:#080f12;
+      --line:rgba(238,241,234,0.12);
+      --line-strong:rgba(238,241,234,0.22);
+      --accent:#4fc4cd;
+      --accent-deep:#7ad9e0;
+      --accent-soft:rgba(79,196,205,0.16);
+      --on-accent:#04191c;
+
+      --status-normal:#4ed17a;
+      --status-normal-soft:rgba(78,209,122,0.16);
+      --status-advisory:#f0b429;
+      --status-advisory-soft:rgba(240,180,41,0.18);
+      --status-watch:#f28a4e;
+      --status-watch-soft:rgba(242,138,78,0.18);
+      --status-warning:#f2604a;
+      --status-warning-soft:rgba(242,96,74,0.18);
+      --status-severe:#e2857e;
+      --status-severe-soft:rgba(226,133,126,0.2);
+
+      --rain:#6fb2e6;
+      --shadow:0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -14px rgba(0,0,0,0.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#eef1ea;
+    --ink-soft:#b7c2c1;
+    --ink-faint:#7f8d8c;
+    --surface:#0b1417;
+    --surface-raised:#111c20;
+    --surface-sunken:#080f12;
+    --line:rgba(238,241,234,0.12);
+    --line-strong:rgba(238,241,234,0.22);
+    --accent:#4fc4cd;
+    --accent-deep:#7ad9e0;
+    --accent-soft:rgba(79,196,205,0.16);
+    --on-accent:#04191c;
+
+    --status-normal:#4ed17a;
+    --status-normal-soft:rgba(78,209,122,0.16);
+    --status-advisory:#f0b429;
+    --status-advisory-soft:rgba(240,180,41,0.18);
+    --status-watch:#f28a4e;
+    --status-watch-soft:rgba(242,138,78,0.18);
+    --status-warning:#f2604a;
+    --status-warning-soft:rgba(242,96,74,0.18);
+    --status-severe:#e2857e;
+    --status-severe-soft:rgba(226,133,126,0.2);
+
+    --rain:#6fb2e6;
+    --shadow:0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -14px rgba(0,0,0,0.6);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--surface);
+    color:var(--ink);
+    font-family:'Public Sans', system-ui, sans-serif;
+    font-size:15px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--accent-soft);}
+
+  .wrap{max-width:1280px;margin:0 auto;padding:28px 24px 64px;}
+
+  .mono{font-family:'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric:tabular-nums;}
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.11em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    font-weight:500;
+  }
+
+  header.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:16px;
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  header.top h1{
+    font-family:'Archivo', sans-serif;
+    font-weight:900;
+    font-size:clamp(28px, 4vw, 40px);
+    letter-spacing:-0.01em;
+    text-wrap:balance;
+    margin:4px 0 0;
+    line-height:1.02;
+  }
+  header.top .titleblock{display:flex; flex-direction:column; gap:6px;}
+  header.top .meta{
+    text-align:right;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .theme-toggle{
+    align-self:flex-start;
+    border:1px solid var(--line-strong);
+    background:var(--surface-raised);
+    color:var(--ink-soft);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:6px 10px;
+    border-radius:100px;
+    cursor:pointer;
+  }
+  .theme-toggle:hover{border-color:var(--accent); color:var(--accent);}
+
+  .notice{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    background:var(--surface-raised);
+    border:1px dashed var(--line-strong);
+    border-radius:8px;
+    padding:10px 14px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-bottom:24px;
+  }
+  .notice b{color:var(--ink);}
+
+  /* ---- status board ---- */
+  .board{
+    display:grid;
+    grid-template-columns:1.15fr 1fr 1fr;
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .card{
+    background:var(--surface-raised);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px 18px;
+    box-shadow:var(--shadow);
+  }
+  .status-card{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    gap:10px;
+    border-left:5px solid var(--status-normal);
+    transition:border-color .15s ease;
+  }
+  .status-card .level-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    align-self:flex-start;
+    padding:5px 12px 5px 9px;
+    border-radius:100px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    background:var(--status-normal-soft);
+    color:var(--status-normal);
+  }
+  .status-card .level-chip .dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+  .status-card .discharge{
+    font-family:'Archivo', sans-serif;
+    font-weight:900;
+    font-size:40px;
+    line-height:1;
+    letter-spacing:-0.01em;
+    font-variant-numeric:tabular-nums;
+  }
+  .status-card .discharge small{font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:500; color:var(--ink-faint); margin-left:6px;}
+  .status-card .action-text{font-size:13px; color:var(--ink-soft); min-height:34px;}
+  .status-card .date-label{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-faint);}
+
+  .stat-card{display:flex; flex-direction:column; gap:6px; justify-content:center;}
+  .stat-card .num{font-family:'Archivo',sans-serif; font-weight:900; font-size:30px; line-height:1;}
+  .stat-card .label{font-size:12.5px; color:var(--ink-soft);}
+
+  /* ---- scrubber ---- */
+  .scrubber-card{margin-bottom:18px;}
+  .scrubber-head{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; flex-wrap:wrap;}
+  .scrubber-title{font-family:'Archivo',sans-serif; font-weight:700; font-size:14px; letter-spacing:0.01em;}
+  .scrubber-controls{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  button.ctrl{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.03em;
+    border:1px solid var(--line-strong);
+    background:var(--surface);
+    color:var(--ink);
+    padding:6px 12px;
+    border-radius:6px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  button.ctrl:hover{border-color:var(--accent); color:var(--accent-deep);}
+  button.ctrl.primary{background:var(--accent); border-color:var(--accent); color:var(--on-accent);}
+  button.ctrl.primary:hover{background:var(--accent-deep); border-color:var(--accent-deep); color:var(--on-accent);}
+  select.jump{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    border:1px solid var(--line-strong);
+    background:var(--surface);
+    color:var(--ink);
+    padding:6px 10px;
+    border-radius:6px;
+  }
+  input[type=range]{
+    width:100%;
+    accent-color:var(--accent);
+    height:20px;
+  }
+  .scrub-dates{display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-faint); margin-top:2px;}
+
+  /* ---- chart canvases ---- */
+  .chart-card{padding:18px 18px 10px;}
+  .chart-head{display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:6px; flex-wrap:wrap;}
+  .chart-title{font-family:'Archivo',sans-serif; font-weight:700; font-size:15px;}
+  .chart-sub{font-size:12px; color:var(--ink-faint);}
+  canvas{display:block; width:100%;}
+  .legend-row{display:flex; gap:16px; flex-wrap:wrap; margin-top:10px; padding-top:10px; border-top:1px solid var(--line);}
+  .legend-item{display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+  .legend-swatch{width:12px; height:3px; border-radius:2px;}
+  .legend-swatch.dot{width:8px;height:8px;border-radius:50%;}
+  .tooltip{
+    position:absolute;
+    pointer-events:none;
+    background:var(--ink);
+    color:var(--surface-raised);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    padding:7px 10px;
+    border-radius:6px;
+    line-height:1.45;
+    box-shadow:var(--shadow);
+    opacity:0;
+    transform:translate(-50%,-100%);
+    white-space:nowrap;
+    z-index:20;
+    transition:opacity .08s ease;
+  }
+  :root[data-theme="dark"] .tooltip, @media (prefers-color-scheme:dark){ .tooltip{ } }
+
+  .main-grid{
+    display:grid;
+    grid-template-columns:1.55fr 1fr;
+    gap:14px;
+    margin-bottom:14px;
+    align-items:start;
+  }
+  .chart-wrap{position:relative;}
+
+  /* ---- threshold table ---- */
+  table.thresh{width:100%; border-collapse:collapse; font-size:12.5px; margin-top:8px;}
+  table.thresh th{
+    text-align:left; font-family:'IBM Plex Mono',monospace; font-weight:500; font-size:10.5px;
+    letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-faint);
+    padding:6px 8px; border-bottom:1px solid var(--line-strong);
+  }
+  table.thresh td{padding:8px 8px; border-bottom:1px solid var(--line); vertical-align:middle;}
+  table.thresh tr:last-child td{border-bottom:none;}
+  .lvl-tag{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600;
+    letter-spacing:0.03em; text-transform:uppercase;
+  }
+  .lvl-tag .dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+  .q-val{font-family:'IBM Plex Mono',monospace; font-variant-numeric:tabular-nums;}
+
+  /* ---- event log ---- */
+  .event-card{max-height:398px; overflow:auto;}
+  table.events{width:100%; border-collapse:collapse; font-size:12.5px;}
+  table.events th{
+    position:sticky; top:0; background:var(--surface-raised);
+    text-align:left; font-family:'IBM Plex Mono',monospace; font-weight:500; font-size:10.5px;
+    letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-faint);
+    padding:6px 8px; border-bottom:1px solid var(--line-strong);
+  }
+  table.events td{padding:7px 8px; border-bottom:1px solid var(--line);}
+  table.events tr.ev-row{cursor:pointer;}
+  table.events tr.ev-row:hover td{background:var(--accent-soft);}
+
+  /* ---- case studies ---- */
+  .case-section{margin-top:20px;}
+  .section-head{display:flex; align-items:baseline; gap:10px; margin-bottom:12px;}
+  .section-head h2{font-family:'Archivo',sans-serif; font-weight:900; font-size:20px; margin:0;}
+  .case-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .case-card{padding:16px 18px;}
+  .case-head{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px; flex-wrap:wrap; gap:8px;}
+  .case-year{font-family:'Archivo',sans-serif; font-weight:900; font-size:22px;}
+  .lead-badge{
+    display:flex; flex-direction:column; align-items:flex-end; gap:0;
+  }
+  .lead-badge .num{font-family:'Archivo',sans-serif; font-weight:900; font-size:22px; color:var(--accent-deep); line-height:1;}
+  .lead-badge .lbl{font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.05em; text-transform:uppercase; color:var(--ink-faint);}
+  .case-sub{font-size:12px; color:var(--ink-soft); margin-bottom:10px;}
+  .case-charts{display:flex; flex-direction:column; gap:2px;}
+
+  /* ---- live conditions ---- */
+  .live-section{margin-bottom:22px;}
+  .live-head{display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;}
+  .live-head h2{font-family:'Archivo',sans-serif; font-weight:900; font-size:20px; margin:0;}
+  .live-dot{width:9px; height:9px; border-radius:50%; background:var(--status-normal); box-shadow:0 0 0 3px var(--status-normal-soft);}
+  .live-dot.stale{background:var(--ink-faint); box-shadow:none;}
+  .live-asof{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-faint);}
+  .live-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .live-card{padding:16px 18px;}
+  .live-card-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px; gap:8px; flex-wrap:wrap;}
+  .live-card-title{font-family:'Archivo',sans-serif; font-weight:700; font-size:14px;}
+  .trigger-pill{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; font-weight:600;
+    letter-spacing:0.03em; text-transform:uppercase;
+    padding:4px 10px; border-radius:100px;
+  }
+  .trigger-pill.clear{background:var(--status-normal-soft); color:var(--status-normal);}
+  .trigger-pill.hit{background:var(--status-watch-soft); color:var(--status-watch);}
+  .rolling-readout{display:flex; align-items:baseline; gap:8px; margin:6px 0 8px;}
+  .rolling-readout .num{font-family:'Archivo',sans-serif; font-weight:900; font-size:28px;}
+  .rolling-readout .of{font-size:12px; color:var(--ink-faint); font-family:'IBM Plex Mono',monospace;}
+  .proxy-note{
+    margin-top:10px; padding:9px 11px; border-radius:7px;
+    background:var(--surface-sunken); border:1px solid var(--line);
+    font-size:11.5px; color:var(--ink-soft); line-height:1.5;
+  }
+  .proxy-note b{color:var(--ink);}
+  .live-missing{
+    display:flex; flex-direction:column; gap:6px; align-items:flex-start;
+    padding:22px 20px; color:var(--ink-soft); font-size:13px;
+  }
+  .live-missing code{
+    font-family:'IBM Plex Mono',monospace; font-size:12px;
+    background:var(--surface-sunken); padding:2px 6px; border-radius:4px;
+  }
+
+  footer.notes{
+    margin-top:30px;
+    padding-top:16px;
+    border-top:1px solid var(--line-strong);
+    font-size:11.5px;
+    color:var(--ink-faint);
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  footer.notes b{color:var(--ink-soft);}
+
+  @media (max-width: 980px){
+    .board{grid-template-columns:1fr;}
+    .main-grid{grid-template-columns:1fr;}
+    .case-grid{grid-template-columns:1fr;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important; animation:none !important;}
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="top">
+    <div class="titleblock">
+      <span class="eyebrow">Barnawa Catchment &middot; Kaduna, Nigeria</span>
+      <h1>Early Warning System</h1>
+      <span class="eyebrow" id="recordSpan">Historical replay &middot; 1990&ndash;2025</span>
+    </div>
+    <div style="display:flex; align-items:flex-end; gap:14px;">
+      <button class="theme-toggle" id="themeToggle" type="button">Theme: Auto</button>
+      <div class="meta">
+        <span>36-YR DAILY DISCHARGE RECORD</span>
+        <span>THRESHOLDS &middot; GUMBEL EV-I, R&sup2; = <span id="rsqTag">&mdash;</span></span>
+      </div>
+    </div>
+  </header>
+
+  <div class="notice">
+    <span>&#9888;</span>
+    <span><b>Historical replay tool, not a live feed.</b> This board replays the 1990&ndash;2025 daily
+    streamflow record against thresholds derived from a Gumbel frequency analysis of the same record.
+    Scrub the timeline or jump to a recorded episode below to see how the system would have classified it.
+    Wiring a live/forecast feed (e.g. GEOGloWS) in place of the replay data is the natural next step toward
+    an operational system.</span>
+  </div>
+
+  <!-- live conditions -->
+  <div class="live-section">
+    <div class="live-head">
+      <span class="live-dot" id="liveDot"></span>
+      <h2>Live conditions</h2>
+      <span class="live-asof" id="liveAsOf">&mdash;</span>
+    </div>
+    <div id="liveBody"></div>
+  </div>
+
+  <!-- status board -->
+  <div class="board">
+    <div class="card status-card" id="statusCard">
+      <div>
+        <span class="date-label" id="statusDate">&mdash;</span>
+        <div class="discharge" id="statusDischarge">&mdash;<small>m&sup3;/s</small></div>
+      </div>
+      <div>
+        <span class="level-chip" id="levelChip"><span class="dot"></span><span id="levelChipText">NORMAL</span></span>
+        <div class="action-text" id="actionText">Flow within the normal range for this catchment.</div>
+      </div>
+    </div>
+    <div class="card stat-card">
+      <div class="num" id="episodeCount">&mdash;</div>
+      <div class="label">Threshold-exceedance episodes recorded, 1990&ndash;2025 (advisory level or higher)</div>
+    </div>
+    <div class="card stat-card">
+      <div class="num" id="severeCount">&mdash;</div>
+      <div class="label">Episode(s) reaching Warning or Severe level &mdash; see event log for dates</div>
+    </div>
+  </div>
+
+  <!-- scrubber -->
+  <div class="card scrubber-card">
+    <div class="scrubber-head">
+      <span class="scrubber-title">Timeline replay</span>
+      <div class="scrubber-controls">
+        <select class="jump" id="jumpSelect"></select>
+        <button class="ctrl" id="stepBack" type="button">&larr; 1y</button>
+        <button class="ctrl primary" id="playBtn" type="button">&#9654; Play</button>
+        <button class="ctrl" id="stepFwd" type="button">1y &rarr;</button>
+      </div>
+    </div>
+    <input type="range" id="scrub" min="0" max="100" value="0" step="1">
+    <div class="scrub-dates"><span id="scrubMin">1990-01-01</span><span id="scrubMax">2025-12-31</span></div>
+  </div>
+
+  <!-- main grid: hydrograph + frequency/threshold panel -->
+  <div class="main-grid">
+    <div class="card chart-card">
+      <div class="chart-head">
+        <span class="chart-title">Daily discharge, 1990&ndash;2025</span>
+        <span class="chart-sub">Hover to inspect &middot; drag the timeline above to move the cursor</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="hydroChart" height="300"></canvas>
+        <div class="tooltip" id="hydroTooltip"></div>
+      </div>
+      <div class="legend-row" id="hydroLegend"></div>
+    </div>
+
+    <div class="card chart-card" style="display:flex; flex-direction:column;">
+      <div class="chart-head">
+        <span class="chart-title">Frequency analysis</span>
+        <span class="chart-sub">Annual max. vs. Gumbel fit</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="freqChart" height="190"></canvas>
+        <div class="tooltip" id="freqTooltip"></div>
+      </div>
+      <table class="thresh" id="threshTable"><thead>
+        <tr><th>Level</th><th>Return period</th><th>Discharge</th></tr>
+      </thead><tbody></tbody></table>
+    </div>
+  </div>
+
+  <!-- event log -->
+  <div class="card event-card">
+    <div class="chart-head" style="margin-bottom:8px;">
+      <span class="chart-title">Event log &mdash; all recorded episodes</span>
+      <span class="chart-sub">Click a row to move the replay there</span>
+    </div>
+    <table class="events" id="eventsTable"><thead>
+      <tr><th>Peak date</th><th>Level</th><th>Peak discharge</th><th>Duration</th></tr>
+    </thead><tbody></tbody></table>
+  </div>
+
+  <!-- case studies -->
+  <div class="case-section">
+    <div class="section-head">
+      <h2>Rainfall-to-peak lead time</h2>
+      <span class="chart-sub">Two recorded flood seasons, rainfall trigger vs. discharge response</span>
+    </div>
+    <div class="case-grid" id="caseGrid"></div>
+  </div>
+
+  <footer class="notes">
+    <span><b>Threshold method.</b> Annual maximum daily discharge for each of the 36 years (1990&ndash;2025) was ranked and fit to a Gumbel (Extreme Value Type I) distribution using the reduced-variate linear regression <span class="mono">Q = a&middot;y + b</span>, the same method already used for the project's rainfall frequency analysis. Advisory/Watch/Warning/Severe map to the 2/5/10/25-year return-period discharges from that fit.</span>
+    <span><b>Rainfall trigger.</b> For the 2012 and 2022 case studies, the trigger time is the most recent point before the discharge peak at which trailing 24-hour rainfall reached 20&nbsp;mm &mdash; a standard heavy-rainfall threshold &mdash; used here as a stand-in for a forecast/nowcast rainfall alert.</span>
+    <span><b>Scope.</b> Built on the historical record only; no live or forecast feed is connected. Episode detection merges exceedance days separated by a single dry day into one continuous episode.</span>
+  </footer>
+
+</div>
+
+<script id="ews-data" type="application/json">__EWS_DATA_JSON__</script>
+<script id="live-data" type="application/json">__LIVE_DATA_JSON__</script>
+<script>
+(function(){
+  "use strict";
+  var DATA = JSON.parse(document.getElementById('ews-data').textContent);
+  var LEVELS = ["normal","advisory","watch","warning","severe"];
+  var LEVEL_LABEL = {normal:"Normal", advisory:"Advisory", watch:"Watch", warning:"Warning", severe:"Severe / Emergency"};
+  var LEVEL_ACTION = {
+    normal: "Flow within the normal range for this catchment.",
+    advisory: DATA.thresholds.advisory.action,
+    watch: DATA.thresholds.watch.action,
+    warning: DATA.thresholds.warning.action,
+    severe: DATA.thresholds.severe.action
+  };
+
+  function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function levelColor(lvl){ return cssVar('--status-' + lvl); }
+  function fmtNum(n, d){ return Number(n).toLocaleString(undefined, {minimumFractionDigits:d||0, maximumFractionDigits:d||0}); }
+
+  // ---------------- theme toggle ----------------
+  var root = document.documentElement;
+  var themeBtn = document.getElementById('themeToggle');
+  var themeState = 'auto';
+  themeBtn.addEventListener('click', function(){
+    themeState = themeState === 'auto' ? 'dark' : (themeState === 'dark' ? 'light' : 'auto');
+    if(themeState === 'auto'){ root.removeAttribute('data-theme'); themeBtn.textContent = 'Theme: Auto'; }
+    else { root.setAttribute('data-theme', themeState); themeBtn.textContent = 'Theme: ' + (themeState[0].toUpperCase()+themeState.slice(1)); }
+    requestAnimationFrame(redrawAll);
+  });
+
+  // ---------------- header meta ----------------
+  document.getElementById('recordSpan').textContent = 'Historical replay · ' + DATA.meta.record_period;
+  document.getElementById('rsqTag').textContent = DATA.gumbel_fit.r_squared.toFixed(3);
+
+  var episodesAll = DATA.episodes.slice();
+  document.getElementById('episodeCount').textContent = episodesAll.length;
+  var majorEvents = episodesAll.filter(function(e){ return e.peak_level === 'warning' || e.peak_level === 'severe'; });
+  document.getElementById('severeCount').textContent = majorEvents.length;
+
+  // ---------------- threshold table ----------------
+  var tbody = document.querySelector('#threshTable tbody');
+  ['advisory','watch','warning','severe'].forEach(function(k){
+    var t = DATA.thresholds[k];
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><span class="lvl-tag" style="color:'+levelColor(k)+'"><span class="dot"></span>'+t.label+'</span></td>'+
+                    '<td class="q-val">1-in-'+t.T+'yr</td>'+
+                    '<td class="q-val">'+fmtNum(t.discharge,0)+' m&sup3;/s</td>';
+    tbody.appendChild(tr);
+  });
+
+  // ---------------- events table ----------------
+  var evBody = document.querySelector('#eventsTable tbody');
+  var episodesDesc = episodesAll.slice().sort(function(a,b){ return b.peak_date.localeCompare(a.peak_date); });
+  episodesDesc.forEach(function(e){
+    var tr = document.createElement('tr');
+    tr.className = 'ev-row';
+    tr.innerHTML = '<td class="mono">'+e.peak_date+'</td>'+
+                    '<td><span class="lvl-tag" style="color:'+levelColor(e.peak_level)+'"><span class="dot"></span>'+LEVEL_LABEL[e.peak_level]+'</span></td>'+
+                    '<td class="q-val">'+fmtNum(e.peak_discharge,0)+' m&sup3;/s</td>'+
+                    '<td class="mono">'+e.duration_days+' day'+(e.duration_days>1?'s':'')+'</td>';
+    tr.addEventListener('click', function(){ setDateIndex(dateToIndex[e.peak_date]); });
+    evBody.appendChild(tr);
+  });
+
+  // ---------------- jump select ----------------
+  var jumpSelect = document.getElementById('jumpSelect');
+  var optDefault = document.createElement('option');
+  optDefault.value = ''; optDefault.textContent = 'Jump to episode…';
+  jumpSelect.appendChild(optDefault);
+  episodesDesc.forEach(function(e){
+    var opt = document.createElement('option');
+    opt.value = e.peak_date;
+    opt.textContent = e.peak_date + ' — ' + LEVEL_LABEL[e.peak_level] + ' (' + fmtNum(e.peak_discharge,0) + ' m³/s)';
+    jumpSelect.appendChild(opt);
+  });
+  jumpSelect.addEventListener('change', function(){
+    if(jumpSelect.value){ setDateIndex(dateToIndex[jumpSelect.value]); }
+  });
+
+  // ---------------- daily series / scrubber ----------------
+  var series = DATA.daily_series; // [{t,q,lvl}]
+  var dateToIndex = {};
+  series.forEach(function(d, i){ dateToIndex[d.t] = i; });
+
+  var scrub = document.getElementById('scrub');
+  scrub.max = series.length - 1;
+  document.getElementById('scrubMin').textContent = series[0].t;
+  document.getElementById('scrubMax').textContent = series[series.length-1].t;
+
+  var curIndex = series.length - 1;
+
+  function setDateIndex(i){
+    curIndex = Math.max(0, Math.min(series.length-1, i));
+    scrub.value = curIndex;
+    updateStatusCard();
+    drawHydro();
+  }
+
+  function updateStatusCard(){
+    var d = series[curIndex];
+    var lvl = LEVELS[d.lvl];
+    document.getElementById('statusDate').textContent = d.t;
+    document.getElementById('statusDischarge').innerHTML = fmtNum(d.q,1) + '<small>m³/s</small>';
+    var chip = document.getElementById('levelChip');
+    var card = document.getElementById('statusCard');
+    var color = lvl === 'normal' ? cssVar('--status-normal') : levelColor(lvl);
+    var soft = lvl === 'normal' ? cssVar('--status-normal-soft') : cssVar('--status-'+lvl+'-soft');
+    chip.style.color = color; chip.style.background = soft;
+    card.style.borderLeftColor = color;
+    document.getElementById('levelChipText').textContent = LEVEL_LABEL[lvl];
+    document.getElementById('actionText').textContent = LEVEL_ACTION[lvl];
+  }
+
+  scrub.addEventListener('input', function(){ setDateIndex(parseInt(scrub.value,10)); });
+
+  document.getElementById('stepBack').addEventListener('click', function(){ setDateIndex(curIndex - 365); });
+  document.getElementById('stepFwd').addEventListener('click', function(){ setDateIndex(curIndex + 365); });
+
+  var playing = false, playTimer = null;
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.getElementById('playBtn').addEventListener('click', function(){
+    playing = !playing;
+    this.innerHTML = playing ? '&#10074;&#10074; Pause' : '&#9654; Play';
+    if(playing){
+      var stepSize = reduceMotion ? 30 : 6;
+      playTimer = setInterval(function(){
+        if(curIndex >= series.length - 1){ curIndex = 0; }
+        setDateIndex(curIndex + stepSize);
+      }, 40);
+    } else {
+      clearInterval(playTimer);
+    }
+  });
+
+  // ================= CANVAS CHART HELPERS =================
+  function setupCanvas(canvas){
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if(!canvas.dataset.baseHeight){ canvas.dataset.baseHeight = canvas.getBoundingClientRect().height || canvas.height; }
+    var h = parseFloat(canvas.dataset.baseHeight);
+    var w = canvas.getBoundingClientRect().width;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    canvas.style.height = h + 'px';
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    return {ctx:ctx, w:w, h:h};
+  }
+
+  // ---------------- hydrograph ----------------
+  var hydroCanvas = document.getElementById('hydroChart');
+  var hydroTooltip = document.getElementById('hydroTooltip');
+  var hydroPad = {l:52, r:14, t:10, b:26};
+
+  function drawHydro(){
+    var setup = setupCanvas(hydroCanvas);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+    var plotW = W - hydroPad.l - hydroPad.r;
+    var plotH = H - hydroPad.t - hydroPad.b;
+
+    var maxQ = Math.max(DATA.thresholds.severe.discharge * 1.08, d3max());
+    function d3max(){ var m=0; for(var i=0;i<series.length;i++){ if(series[i].q>m) m=series[i].q; } return m; }
+    var yScale = function(q){ return hydroPad.t + plotH - (q/maxQ)*plotH; };
+    var xScale = function(i){ return hydroPad.l + (i/(series.length-1))*plotW; };
+
+    // gridlines + y ticks
+    ctx.strokeStyle = cssVar('--line'); ctx.lineWidth = 1;
+    ctx.fillStyle = cssVar('--ink-faint');
+    ctx.font = '10px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    var ticks = 4;
+    for(var t=0;t<=ticks;t++){
+      var q = (maxQ/ticks)*t;
+      var y = yScale(q);
+      ctx.beginPath(); ctx.moveTo(hydroPad.l, y); ctx.lineTo(W-hydroPad.r, y); ctx.stroke();
+      ctx.fillText(fmtNum(q,0), hydroPad.l - 8, y);
+    }
+
+    // year ticks (every 5 years)
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    for(var i=0;i<series.length;i++){
+      var yr = series[i].t.slice(0,4);
+      if(series[i].t.slice(5,10)==='01-01' && (parseInt(yr,10)%5===0)){
+        var x = xScale(i);
+        ctx.fillText(yr, x, H - hydroPad.b + 6);
+      }
+    }
+
+    // threshold reference lines
+    ['advisory','watch','warning','severe'].forEach(function(k){
+      var y = yScale(DATA.thresholds[k].discharge);
+      ctx.strokeStyle = levelColor(k); ctx.globalAlpha = 0.55; ctx.lineWidth = 1;
+      ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(hydroPad.l, y); ctx.lineTo(W-hydroPad.r, y); ctx.stroke();
+      ctx.setLineDash([]); ctx.globalAlpha = 1;
+    });
+
+    // discharge line
+    ctx.beginPath();
+    ctx.strokeStyle = cssVar('--accent');
+    ctx.lineWidth = 1.1;
+    ctx.lineJoin = 'round';
+    var step = Math.max(1, Math.floor(series.length / (plotW*2)));
+    for(var i=0;i<series.length;i+=step){
+      var x = xScale(i), y = yScale(series[i].q);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    // cursor
+    var cx = xScale(curIndex);
+    ctx.strokeStyle = cssVar('--ink'); ctx.globalAlpha = 0.5; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(cx, hydroPad.t); ctx.lineTo(cx, H-hydroPad.b); ctx.stroke();
+    ctx.globalAlpha = 1;
+    var cy = yScale(series[curIndex].q);
+    ctx.fillStyle = levelColor(LEVELS[series[curIndex].lvl]) || cssVar('--accent');
+    if(series[curIndex].lvl===0) ctx.fillStyle = cssVar('--accent');
+    ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = cssVar('--surface-raised'); ctx.lineWidth = 1.5; ctx.stroke();
+
+    hydroCanvas._scale = {xScale:xScale, yScale:yScale, plotW:plotW};
+  }
+
+  var hydroLegend = document.getElementById('hydroLegend');
+  (function buildLegend(){
+    var items = [{c:'--accent', l:'Daily discharge'}].concat(
+      ['advisory','watch','warning','severe'].map(function(k){ return {c:'--status-'+k, l:DATA.thresholds[k].label}; })
+    );
+    items.forEach(function(it){
+      var el = document.createElement('span');
+      el.className = 'legend-item';
+      el.innerHTML = '<span class="legend-swatch" style="background:'+cssVar(it.c)+'"></span>'+it.l;
+      hydroLegend.appendChild(el);
+    });
+  })();
+
+  hydroCanvas.addEventListener('mousemove', function(e){
+    var rect = hydroCanvas.getBoundingClientRect();
+    var mx = e.clientX - rect.left;
+    var sc = hydroCanvas._scale; if(!sc) return;
+    var frac = (mx - hydroPad.l) / sc.plotW;
+    var idx = Math.round(frac * (series.length-1));
+    idx = Math.max(0, Math.min(series.length-1, idx));
+    var d = series[idx];
+    hydroTooltip.style.opacity = 1;
+    hydroTooltip.style.left = mx + 'px';
+    hydroTooltip.style.top = (sc.yScale(d.q) - 12) + 'px';
+    hydroTooltip.innerHTML = d.t + '<br>' + fmtNum(d.q,1) + ' m³/s &middot; ' + LEVEL_LABEL[LEVELS[d.lvl]];
+  });
+  hydroCanvas.addEventListener('mouseleave', function(){ hydroTooltip.style.opacity = 0; });
+  hydroCanvas.addEventListener('click', function(e){
+    var rect = hydroCanvas.getBoundingClientRect();
+    var mx = e.clientX - rect.left;
+    var sc = hydroCanvas._scale; if(!sc) return;
+    var frac = (mx - hydroPad.l) / sc.plotW;
+    var idx = Math.round(frac * (series.length-1));
+    setDateIndex(idx);
+  });
+
+  // ---------------- frequency chart ----------------
+  var freqCanvas = document.getElementById('freqChart');
+  var freqTooltip = document.getElementById('freqTooltip');
+  var freqPad = {l:46, r:14, t:12, b:26};
+
+  function drawFreq(){
+    var setup = setupCanvas(freqCanvas);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+    var plotW = W - freqPad.l - freqPad.r;
+    var plotH = H - freqPad.t - freqPad.b;
+
+    var pts = DATA.gumbel_fit.annual_max_ranked;
+    var yMin = Math.min.apply(null, pts.map(function(p){return p.reduced_variate_y;}));
+    var yMax = Math.max.apply(null, pts.map(function(p){return p.reduced_variate_y;}));
+    var qMax = Math.max.apply(null, pts.map(function(p){return p.max_flow;})) * 1.08;
+
+    var xScale = function(y){ return freqPad.l + ((y - yMin)/(yMax-yMin))*plotW; };
+    var yScale = function(q){ return freqPad.t + plotH - (q/qMax)*plotH; };
+
+    ctx.strokeStyle = cssVar('--line'); ctx.lineWidth = 1;
+    ctx.fillStyle = cssVar('--ink-faint');
+    ctx.font = '9.5px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    for(var t=0;t<=3;t++){
+      var q = (qMax/3)*t;
+      var y = yScale(q);
+      ctx.beginPath(); ctx.moveTo(freqPad.l,y); ctx.lineTo(W-freqPad.r,y); ctx.stroke();
+      ctx.fillText(fmtNum(q,0), freqPad.l-6, y);
+    }
+
+    // fit line
+    var a = DATA.gumbel_fit.slope_a, b = DATA.gumbel_fit.intercept_b;
+    ctx.beginPath();
+    ctx.strokeStyle = cssVar('--accent'); ctx.lineWidth = 1.4;
+    var yv0 = yMin, yv1 = yMax;
+    ctx.moveTo(xScale(yv0), yScale(a*yv0+b));
+    ctx.lineTo(xScale(yv1), yScale(a*yv1+b));
+    ctx.stroke();
+
+    // threshold marks
+    ['advisory','watch','warning','severe'].forEach(function(k){
+      var yy = yScale(DATA.thresholds[k].discharge);
+      ctx.strokeStyle = levelColor(k); ctx.globalAlpha=0.55; ctx.setLineDash([3,3]); ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(freqPad.l, yy); ctx.lineTo(W-freqPad.r, yy); ctx.stroke();
+      ctx.setLineDash([]); ctx.globalAlpha=1;
+    });
+
+    // points
+    var positions = [];
+    pts.forEach(function(p){
+      var x = xScale(p.reduced_variate_y), y = yScale(p.max_flow);
+      positions.push({x:x,y:y,p:p});
+      ctx.beginPath();
+      ctx.fillStyle = cssVar('--ink-soft');
+      ctx.arc(x,y,2.6,0,Math.PI*2);
+      ctx.fill();
+    });
+    freqCanvas._positions = positions;
+
+    ctx.fillStyle = cssVar('--ink-faint');
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    ctx.fillText('reduced variate y →', freqPad.l + plotW/2, H-freqPad.b+10);
+  }
+
+  freqCanvas.addEventListener('mousemove', function(e){
+    var rect = freqCanvas.getBoundingClientRect();
+    var mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    var positions = freqCanvas._positions || [];
+    var best=null, bd=1e9;
+    positions.forEach(function(pp){
+      var d = Math.hypot(pp.x-mx, pp.y-my);
+      if(d<bd){bd=d; best=pp;}
+    });
+    if(best && bd<20){
+      freqTooltip.style.opacity=1;
+      freqTooltip.style.left = best.x+'px';
+      freqTooltip.style.top = (best.y-10)+'px';
+      freqTooltip.innerHTML = best.p.year+'<br>'+fmtNum(best.p.max_flow,0)+' m³/s &middot; T='+best.p.return_period_T.toFixed(1)+'y';
+    } else {
+      freqTooltip.style.opacity=0;
+    }
+  });
+  freqCanvas.addEventListener('mouseleave', function(){ freqTooltip.style.opacity=0; });
+
+  // ---------------- case studies ----------------
+  var caseGrid = document.getElementById('caseGrid');
+  DATA.case_studies.forEach(function(cs){
+    var card = document.createElement('div');
+    card.className = 'card case-card';
+    var lvlColor = cs.peak_level==='normal' ? cssVar('--status-normal') : levelColor(cs.peak_level);
+    card.innerHTML =
+      '<div class="case-head">'+
+        '<div><div class="case-year">'+cs.year+'</div>'+
+        '<div class="case-sub">Peak '+cs.peak_time+' &middot; '+fmtNum(cs.peak_discharge,0)+' m³/s &middot; '+
+        '<span class="lvl-tag" style="color:'+lvlColor+'"><span class="dot"></span>'+LEVEL_LABEL[cs.peak_level]+'</span></div></div>'+
+        (cs.lead_time_hours!=null ? '<div class="lead-badge"><span class="num">'+Math.round(cs.lead_time_hours)+'h</span><span class="lbl">Lead time</span></div>' : '')+
+      '</div>'+
+      '<div class="case-sub">Rainfall trigger (≥20mm/24h): <span class="mono">'+(cs.trigger_time||'not reached')+'</span></div>'+
+      '<div class="case-charts">'+
+        '<canvas class="rain-canvas" height="70" data-year="'+cs.year+'"></canvas>'+
+        '<canvas class="q-canvas" height="90" data-year="'+cs.year+'"></canvas>'+
+      '</div>';
+    caseGrid.appendChild(card);
+  });
+
+  function drawCaseCharts(){
+    DATA.case_studies.forEach(function(cs){
+      var rainCanvas = caseGrid.querySelector('.rain-canvas[data-year="'+cs.year+'"]');
+      var qCanvas = caseGrid.querySelector('.q-canvas[data-year="'+cs.year+'"]');
+      var pad = {l:44, r:10, t:8, b:4};
+
+      // rainfall bars
+      (function(){
+        var setup = setupCanvas(rainCanvas);
+        var ctx=setup.ctx, W=setup.w, H=setup.h;
+        ctx.clearRect(0,0,W,H);
+        var plotW = W-pad.l-pad.r, plotH = H-pad.t-pad.b;
+        var data = cs.rainfall_hourly;
+        var maxMM = Math.max.apply(null, data.map(function(d){return d.mm;})) || 1;
+        var barW = plotW/data.length;
+        ctx.fillStyle = cssVar('--rain');
+        for(var i=0;i<data.length;i++){
+          var h = (data[i].mm/maxMM)*plotH;
+          ctx.fillRect(pad.l + i*barW, pad.t+plotH-h, Math.max(barW-0.3,0.6), h);
+        }
+        ctx.fillStyle = cssVar('--ink-faint');
+        ctx.font = '9.5px "IBM Plex Mono", monospace';
+        ctx.textAlign='right'; ctx.textBaseline='top';
+        ctx.fillText(fmtNum(maxMM,0)+'mm', pad.l-6, pad.t);
+        ctx.textAlign='left';
+        ctx.fillText('Hourly rainfall (Jul–Oct)', pad.l, 0);
+      })();
+
+      // discharge line
+      (function(){
+        var setup = setupCanvas(qCanvas);
+        var ctx=setup.ctx, W=setup.w, H=setup.h;
+        ctx.clearRect(0,0,W,H);
+        var plotW = W-pad.l-pad.r, plotH = H-pad.t-pad.b;
+        var data = cs.discharge_daily;
+        var maxQ = Math.max(DATA.thresholds.watch.discharge*1.05, Math.max.apply(null, data.map(function(d){return d.q;})));
+        var xScale = function(i){ return pad.l + (i/(data.length-1))*plotW; };
+        var yScale = function(q){ return pad.t + plotH - (q/maxQ)*plotH; };
+
+        ctx.strokeStyle = cssVar('--line'); ctx.lineWidth=1;
+        ctx.fillStyle = cssVar('--ink-faint');
+        ctx.font = '9.5px "IBM Plex Mono", monospace';
+        ctx.textAlign='right'; ctx.textBaseline='middle';
+        [0,1].forEach(function(t){
+          var q = maxQ*t; var y=yScale(q);
+          ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+          ctx.fillText(fmtNum(q,0), pad.l-6, y);
+        });
+
+        ['advisory','watch','warning','severe'].forEach(function(k){
+          if(DATA.thresholds[k].discharge > maxQ) return;
+          var y = yScale(DATA.thresholds[k].discharge);
+          ctx.strokeStyle = levelColor(k); ctx.globalAlpha=0.55; ctx.setLineDash([3,3]); ctx.lineWidth=1;
+          ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+          ctx.setLineDash([]); ctx.globalAlpha=1;
+        });
+
+        ctx.beginPath();
+        ctx.strokeStyle = cssVar('--accent'); ctx.lineWidth=1.6; ctx.lineJoin='round';
+        data.forEach(function(d,i){ var x=xScale(i), y=yScale(d.q); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+        ctx.stroke();
+
+        // peak marker
+        var peakIdx = data.findIndex(function(d){ return d.t === cs.peak_time; });
+        if(peakIdx>=0){
+          var px = xScale(peakIdx), py = yScale(data[peakIdx].q);
+          ctx.fillStyle = levelColor(cs.peak_level);
+          ctx.beginPath(); ctx.arc(px,py,4,0,Math.PI*2); ctx.fill();
+          ctx.strokeStyle = cssVar('--surface-raised'); ctx.lineWidth=1.5; ctx.stroke();
+        }
+        ctx.fillStyle = cssVar('--ink-faint');
+        ctx.textAlign='left'; ctx.textBaseline='top';
+        ctx.font = '9.5px "IBM Plex Mono", monospace';
+        ctx.fillText('Daily discharge (m³/s)', pad.l, 0);
+      })();
+    });
+  }
+
+  // ---------------- live conditions ----------------
+  var LIVE = (function(){
+    try { return JSON.parse(document.getElementById('live-data').textContent); }
+    catch(e){ return null; }
+  })();
+
+  function fmtAgo(iso){
+    var then = new Date(iso);
+    var mins = Math.round((Date.now() - then.getTime())/60000);
+    if(mins < 1) return 'just now';
+    if(mins < 60) return mins + ' min ago';
+    var hrs = Math.round(mins/60);
+    return hrs + ' hr' + (hrs===1?'':'s') + ' ago';
+  }
+
+  function buildLivePanel(){
+    var body = document.getElementById('liveBody');
+    var dot = document.getElementById('liveDot');
+    var asOf = document.getElementById('liveAsOf');
+
+    if(!LIVE || !LIVE.fetched_at){
+      dot.classList.add('stale');
+      asOf.textContent = 'not yet fetched';
+      body.innerHTML = '<div class="card live-missing">'+
+        '<span>No live snapshot has been fetched yet.</span>'+
+        '<span>Run <code>python live_fetch.py</code> in the EWS_System folder, then rebuild with '+
+        '<code>python build_dashboard.py</code> — or set up the scheduled task so this happens automatically every 30 minutes.</span>'+
+      '</div>';
+      return;
+    }
+
+    dot.classList.toggle('stale', LIVE.status !== 'ok');
+    asOf.textContent = 'as of ' + LIVE.fetched_at.replace('T',' ').replace('Z',' UTC') + ' · ' + fmtAgo(LIVE.fetched_at);
+
+    var grid = document.createElement('div');
+    grid.className = 'live-grid';
+
+    // ---- rainfall card ----
+    var rc = document.createElement('div');
+    rc.className = 'card live-card';
+    if(LIVE.rainfall){
+      var r = LIVE.rainfall;
+      var triggered = !!r.trigger_time;
+      var pillClass = triggered ? 'hit' : 'clear';
+      var pillText = !triggered ? 'Below trigger'
+        : (r.trigger_is_forecast ? 'Forecast to trigger' : 'Trigger reached');
+      rc.innerHTML =
+        '<div class="live-card-head"><span class="live-card-title">Rainfall — catchment centroid</span>'+
+        '<span class="trigger-pill '+pillClass+'">'+pillText+'</span></div>'+
+        '<div class="rolling-readout"><span class="num">'+r.rolling_24h_mm.toFixed(1)+'<span style="font-size:14px;">mm</span></span>'+
+        '<span class="of">/ ' + r.trigger_threshold_mm_24h.toFixed(0) + 'mm trailing 24h trigger'+
+        (r.trigger_time ? ' · ' + (r.trigger_is_forecast ? 'expected ' : 'reached ') + r.trigger_time : '') + '</span></div>'+
+        '<div class="chart-wrap"><canvas id="liveRainChart" height="110"></canvas><div class="tooltip" id="liveRainTooltip"></div></div>'+
+        '<div class="legend-row" style="margin-top:8px; padding-top:8px;">'+
+          '<span class="legend-item"><span class="legend-swatch" style="background:'+cssVar('--rain')+'"></span>Observed (past 48h)</span>'+
+          '<span class="legend-item"><span class="legend-swatch" style="background:'+cssVar('--rain')+'; opacity:0.4;"></span>Forecast (next 7d)</span>'+
+        '</div>';
+    } else {
+      rc.innerHTML = '<div class="live-card-title">Rainfall</div><div class="proxy-note">Unavailable this fetch'+(LIVE.error?': '+LIVE.error:'')+'.</div>';
+    }
+    grid.appendChild(rc);
+
+    // ---- geoglows card ----
+    var gc = document.createElement('div');
+    gc.className = 'card live-card';
+    if(LIVE.geoglows){
+      var g = LIVE.geoglows;
+      var lastPct = g.forecast.length ? g.forecast[g.forecast.length-1].pct : null;
+      gc.innerHTML =
+        '<div class="live-card-head"><span class="live-card-title">Discharge forecast — nearest reach (proxy)</span></div>'+
+        '<div class="chart-wrap"><canvas id="liveGeoChart" height="110"></canvas><div class="tooltip" id="liveGeoTooltip"></div></div>'+
+        '<div class="proxy-note"><b>Not the Barnawa outlet.</b> Nearest GEOGloWS-mapped reach is ~'+g.distance_km+'km away on a '+
+        'visibly smaller stream (retrospective mean '+g.retrospective_mean+' m&sup3;/s over '+g.retrospective_years+' simulated years, '+
+        'vs. Barnawa\'s observed ~169 m&sup3;/s mean). Values here are not comparable to the Advisory/Watch/Warning/Severe thresholds above — '+
+        'shown only as a rough wet/dry trend cross-check'+(lastPct!=null?' (currently ~'+lastPct+'th percentile of its own record)':'')+'.</div>';
+    } else {
+      gc.innerHTML = '<div class="live-card-title">Discharge forecast</div><div class="proxy-note">Unavailable this fetch'+(LIVE.error?': '+LIVE.error:'')+'.</div>';
+    }
+    grid.appendChild(gc);
+
+    body.innerHTML = '';
+    body.appendChild(grid);
+  }
+
+  function drawLiveCharts(){
+    if(!LIVE || !LIVE.fetched_at) return;
+    var pad = {l:40, r:8, t:6, b:16};
+
+    if(LIVE.rainfall){
+      var canvas = document.getElementById('liveRainChart');
+      var tooltip = document.getElementById('liveRainTooltip');
+      if(canvas){
+        var setup = setupCanvas(canvas);
+        var ctx=setup.ctx, W=setup.w, H=setup.h;
+        ctx.clearRect(0,0,W,H);
+        var plotW=W-pad.l-pad.r, plotH=H-pad.t-pad.b;
+        var obs = LIVE.rainfall.observed, fc = LIVE.rainfall.forecast;
+        var all = obs.concat(fc);
+        var maxMM = Math.max.apply(null, all.map(function(d){return d.mm;})) || 1;
+        var xScale = function(i){ return pad.l + (i/(all.length-1))*plotW; };
+        var yScale = function(mm){ return pad.t + plotH - (mm/maxMM)*plotH; };
+        var barW = plotW/all.length;
+
+        ctx.fillStyle = cssVar('--ink-faint');
+        ctx.font = '9.5px "IBM Plex Mono", monospace';
+        ctx.textAlign='right'; ctx.textBaseline='top';
+        ctx.fillText(fmtNum(maxMM,0)+'mm', pad.l-6, pad.t);
+
+        all.forEach(function(d,i){
+          var isObs = i < obs.length;
+          ctx.fillStyle = cssVar('--rain');
+          ctx.globalAlpha = isObs ? 1 : 0.4;
+          var h = (d.mm/maxMM)*plotH;
+          ctx.fillRect(xScale(i), pad.t+plotH-h, Math.max(barW-0.4,0.6), h);
+        });
+        ctx.globalAlpha=1;
+
+        var nowX = xScale(obs.length-1);
+        ctx.strokeStyle = cssVar('--ink'); ctx.globalAlpha=0.4; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(nowX,pad.t); ctx.lineTo(nowX,pad.t+plotH); ctx.stroke();
+        ctx.globalAlpha=1;
+
+        canvas._live = {xScale:xScale, all:all, obsLen:obs.length};
+        if(tooltip && !canvas._liveBound){
+          canvas._liveBound = true;
+          canvas.addEventListener('mousemove', function(e){
+            var rect = canvas.getBoundingClientRect();
+            var mx = e.clientX-rect.left;
+            var st = canvas._live; if(!st) return;
+            var idx = Math.round((mx-pad.l)/plotW*(st.all.length-1));
+            idx = Math.max(0, Math.min(st.all.length-1, idx));
+            var d = st.all[idx];
+            tooltip.style.opacity=1; tooltip.style.left=mx+'px'; tooltip.style.top='6px';
+            tooltip.innerHTML = d.t + '<br>' + d.mm.toFixed(2) + ' mm' + (idx>=st.obsLen ? ' (forecast)' : ' (observed)');
+          });
+          canvas.addEventListener('mouseleave', function(){ tooltip.style.opacity=0; });
+        }
+      }
+    }
+
+    if(LIVE.geoglows && LIVE.geoglows.forecast.length){
+      var gcanvas = document.getElementById('liveGeoChart');
+      var gtooltip = document.getElementById('liveGeoTooltip');
+      if(gcanvas){
+        var gsetup = setupCanvas(gcanvas);
+        var gctx=gsetup.ctx, GW=gsetup.w, GH=gsetup.h;
+        gctx.clearRect(0,0,GW,GH);
+        var gplotW=GW-pad.l-pad.r, gplotH=GH-pad.t-pad.b;
+        var rows = LIVE.geoglows.forecast;
+        var maxQ = Math.max.apply(null, rows.map(function(d){return d.p75;})) * 1.05 || 1;
+        var gx = function(i){ return pad.l + (i/(rows.length-1))*gplotW; };
+        var gy = function(q){ return pad.t + gplotH - (q/maxQ)*gplotH; };
+
+        gctx.fillStyle = cssVar('--ink-faint');
+        gctx.font = '9.5px "IBM Plex Mono", monospace';
+        gctx.textAlign='right'; gctx.textBaseline='top';
+        gctx.fillText(fmtNum(maxQ,0)+'m³/s', pad.l-6, pad.t);
+
+        // uncertainty band
+        gctx.beginPath();
+        rows.forEach(function(d,i){ var x=gx(i), y=gy(d.p75); if(i===0) gctx.moveTo(x,y); else gctx.lineTo(x,y); });
+        for(var i=rows.length-1;i>=0;i--){ gctx.lineTo(gx(i), gy(rows[i].p25)); }
+        gctx.closePath();
+        gctx.fillStyle = cssVar('--accent-soft');
+        gctx.fill();
+
+        // median line
+        gctx.beginPath();
+        gctx.strokeStyle = cssVar('--accent'); gctx.lineWidth=1.6; gctx.lineJoin='round';
+        rows.forEach(function(d,i){ var x=gx(i), y=gy(d.med); if(i===0) gctx.moveTo(x,y); else gctx.lineTo(x,y); });
+        gctx.stroke();
+
+        gcanvas._live = {gx:gx, rows:rows};
+        if(gtooltip && !gcanvas._liveBound){
+          gcanvas._liveBound = true;
+          gcanvas.addEventListener('mousemove', function(e){
+            var rect = gcanvas.getBoundingClientRect();
+            var mx = e.clientX-rect.left;
+            var st = gcanvas._live; if(!st) return;
+            var idx = Math.round((mx-pad.l)/gplotW*(st.rows.length-1));
+            idx = Math.max(0, Math.min(st.rows.length-1, idx));
+            var d = st.rows[idx];
+            gtooltip.style.opacity=1; gtooltip.style.left=mx+'px'; gtooltip.style.top='6px';
+            gtooltip.innerHTML = d.t.slice(0,16).replace('T',' ') + '<br>' + d.med.toFixed(1) + ' m³/s (' + d.p25.toFixed(1) + '–' + d.p75.toFixed(1) + ')' + (d.pct!=null ? '<br>~'+d.pct+'th pct. of record' : '');
+          });
+          gcanvas.addEventListener('mouseleave', function(){ gtooltip.style.opacity=0; });
+        }
+      }
+    }
+  }
+
+  buildLivePanel();
+
+  function redrawAll(){
+    drawHydro();
+    drawFreq();
+    drawCaseCharts();
+    drawLiveCharts();
+  }
+
+  window.addEventListener('resize', function(){
+    clearTimeout(window._ewsResizeT);
+    window._ewsResizeT = setTimeout(redrawAll, 120);
+  });
+
+  setDateIndex(dateToIndex['2004-08-30'] !== undefined ? dateToIndex['2004-08-30'] : series.length-1);
+  redrawAll();
+})();
+</script>

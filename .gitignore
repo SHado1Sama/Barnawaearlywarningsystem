@@ -1,0 +1,4 @@
+dist/
+live_data.json
+update_live.log
+__pycache__/
