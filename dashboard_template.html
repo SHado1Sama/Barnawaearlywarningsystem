@@ -443,7 +443,7 @@
       <button class="theme-toggle" id="themeToggle" type="button">Theme: Auto</button>
       <div class="meta">
         <span>36-YR DAILY DISCHARGE RECORD</span>
-        <span>THRESHOLDS &middot; GUMBEL EV-I, R&sup2; = <span id="rsqTag">&mdash;</span></span>
+        <span>THRESHOLDS &middot; GUMBEL EV-I, R&sup2; = <span id="rsqTag">-</span></span>
       </div>
     </div>
   </header>
@@ -462,7 +462,7 @@
     <div class="live-head">
       <span class="live-dot" id="liveDot"></span>
       <h2>Live conditions</h2>
-      <span class="live-asof" id="liveAsOf">&mdash;</span>
+      <span class="live-asof" id="liveAsOf">-</span>
     </div>
     <div id="liveBody"></div>
   </div>
@@ -471,8 +471,8 @@
   <div class="board">
     <div class="card status-card" id="statusCard">
       <div>
-        <span class="date-label" id="statusDate">&mdash;</span>
-        <div class="discharge" id="statusDischarge">&mdash;<small>m&sup3;/s</small></div>
+        <span class="date-label" id="statusDate">-</span>
+        <div class="discharge" id="statusDischarge">-<small>m&sup3;/s</small></div>
       </div>
       <div>
         <span class="level-chip" id="levelChip"><span class="dot"></span><span id="levelChipText">NORMAL</span></span>
@@ -480,12 +480,12 @@
       </div>
     </div>
     <div class="card stat-card">
-      <div class="num" id="episodeCount">&mdash;</div>
+      <div class="num" id="episodeCount">-</div>
       <div class="label">Threshold-exceedance episodes recorded, 1990&ndash;2025 (advisory level or higher)</div>
     </div>
     <div class="card stat-card">
-      <div class="num" id="severeCount">&mdash;</div>
-      <div class="label">Episode(s) reaching Warning or Severe level &mdash; see event log for dates</div>
+      <div class="num" id="severeCount">-</div>
+      <div class="label">Episode(s) reaching Warning or Severe level, see event log for dates</div>
     </div>
   </div>
 
@@ -536,7 +536,7 @@
   <!-- event log -->
   <div class="card event-card">
     <div class="chart-head" style="margin-bottom:8px;">
-      <span class="chart-title">Event log &mdash; all recorded episodes</span>
+      <span class="chart-title">Event log, all recorded episodes</span>
       <span class="chart-sub">Click a row to move the replay there</span>
     </div>
     <table class="events" id="eventsTable"><thead>
@@ -555,7 +555,7 @@
 
   <footer class="notes">
     <span><b>Threshold method.</b> Annual maximum daily discharge for each of the 36 years (1990&ndash;2025) was ranked and fit to a Gumbel (Extreme Value Type I) distribution using the reduced-variate linear regression <span class="mono">Q = a&middot;y + b</span>, the same method already used for the project's rainfall frequency analysis. Advisory/Watch/Warning/Severe map to the 2/5/10/25-year return-period discharges from that fit.</span>
-    <span><b>Rainfall trigger.</b> For the 2012 and 2022 case studies, the trigger time is the most recent point before the discharge peak at which trailing 24-hour rainfall reached 20&nbsp;mm &mdash; a standard heavy-rainfall threshold &mdash; used here as a stand-in for a forecast/nowcast rainfall alert.</span>
+    <span><b>Rainfall trigger.</b> For the 2012 and 2022 case studies, the trigger time is the most recent point before the discharge peak at which trailing 24-hour rainfall reached 20&nbsp;mm, a standard heavy-rainfall threshold, used here as a stand-in for a forecast/nowcast rainfall alert.</span>
     <span><b>Scope.</b> Built on the historical record only; no live or forecast feed is connected. Episode detection merges exceedance days separated by a single dry day into one continuous episode.</span>
   </footer>
 
