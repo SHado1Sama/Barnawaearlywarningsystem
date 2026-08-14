@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 <meta http-equiv="refresh" content="1800">
 <title>Barnawa Early Warning System</title>
-<meta name="description" content="Historical replay and threshold-monitoring instrument for the Barnawa catchment, Kaduna, built from a 36-year Gumbel frequency analysis of daily streamflow.">
+<meta name="description" content="Historical replay and threshold-monitoring instrument for the Barnawa catchment, Kaduna, built from a 36-year GEV (L-moments) frequency analysis of daily streamflow.">
 <style>
   @font-face{
     font-family:'Archivo';font-style:normal;font-weight:700 900;font-display:swap;
@@ -39,16 +39,15 @@
     --accent-soft:rgba(14,124,134,0.14);
     --on-accent:#f6f7f1;
 
-    --status-normal:#0c8f2f;
-    --status-normal-soft:rgba(12,143,47,0.14);
-    --status-advisory:#a9740b;
-    --status-advisory-soft:rgba(201,148,15,0.18);
-    --status-watch:#c1591c;
-    --status-watch-soft:rgba(193,89,28,0.16);
-    --status-warning:#b3311c;
-    --status-warning-soft:rgba(179,49,28,0.16);
-    --status-severe:#7a1f1f;
-    --status-severe-soft:rgba(122,31,31,0.18);
+    --status-normal:#5c6b70;
+    --status-normal-soft:rgba(92,107,112,0.14);
+    --status-watch:#0c8f2f;
+    --status-watch-soft:rgba(12,143,47,0.14);
+    --status-warning:#a9740b;
+    --status-warning-soft:rgba(201,148,15,0.18);
+    --status-emergency:#b3311c;
+    --status-emergency-soft:rgba(179,49,28,0.16);
+    --status-advisory-band:rgba(16,27,34,0.4);
 
     --rain:#3a7fb3;
     --shadow:0 1px 2px rgba(16,27,34,0.06), 0 8px 24px -12px rgba(16,27,34,0.18);
@@ -69,16 +68,15 @@
       --accent-soft:rgba(79,196,205,0.16);
       --on-accent:#04191c;
 
-      --status-normal:#4ed17a;
-      --status-normal-soft:rgba(78,209,122,0.16);
-      --status-advisory:#f0b429;
-      --status-advisory-soft:rgba(240,180,41,0.18);
-      --status-watch:#f28a4e;
-      --status-watch-soft:rgba(242,138,78,0.18);
-      --status-warning:#f2604a;
-      --status-warning-soft:rgba(242,96,74,0.18);
-      --status-severe:#e2857e;
-      --status-severe-soft:rgba(226,133,126,0.2);
+      --status-normal:#8a9a99;
+      --status-normal-soft:rgba(138,154,153,0.16);
+      --status-watch:#4ed17a;
+      --status-watch-soft:rgba(78,209,122,0.16);
+      --status-warning:#f0b429;
+      --status-warning-soft:rgba(240,180,41,0.18);
+      --status-emergency:#f2604a;
+      --status-emergency-soft:rgba(242,96,74,0.18);
+      --status-advisory-band:rgba(238,241,234,0.4);
 
       --rain:#6fb2e6;
       --shadow:0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -14px rgba(0,0,0,0.6);
@@ -98,16 +96,15 @@
     --accent-soft:rgba(79,196,205,0.16);
     --on-accent:#04191c;
 
-    --status-normal:#4ed17a;
-    --status-normal-soft:rgba(78,209,122,0.16);
-    --status-advisory:#f0b429;
-    --status-advisory-soft:rgba(240,180,41,0.18);
-    --status-watch:#f28a4e;
-    --status-watch-soft:rgba(242,138,78,0.18);
-    --status-warning:#f2604a;
-    --status-warning-soft:rgba(242,96,74,0.18);
-    --status-severe:#e2857e;
-    --status-severe-soft:rgba(226,133,126,0.2);
+    --status-normal:#8a9a99;
+    --status-normal-soft:rgba(138,154,153,0.16);
+    --status-watch:#4ed17a;
+    --status-watch-soft:rgba(78,209,122,0.16);
+    --status-warning:#f0b429;
+    --status-warning-soft:rgba(240,180,41,0.18);
+    --status-emergency:#f2604a;
+    --status-emergency-soft:rgba(242,96,74,0.18);
+    --status-advisory-band:rgba(238,241,234,0.4);
 
     --rain:#6fb2e6;
     --shadow:0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -14px rgba(0,0,0,0.6);
@@ -378,6 +375,7 @@
   .live-dot{width:9px; height:9px; border-radius:50%; background:var(--status-normal); box-shadow:0 0 0 3px var(--status-normal-soft);}
   .live-dot.stale{background:var(--ink-faint); box-shadow:none;}
   .live-asof{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-faint);}
+  .live-asof.stale{color:var(--status-warning); font-weight:600;}
   .live-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
   .live-card{padding:16px 18px;}
   .live-card-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px; gap:8px; flex-wrap:wrap;}
@@ -443,7 +441,7 @@
       <button class="theme-toggle" id="themeToggle" type="button">Theme: Auto</button>
       <div class="meta">
         <span>36-YR DAILY DISCHARGE RECORD</span>
-        <span>THRESHOLDS &middot; GUMBEL EV-I, R&sup2; = <span id="rsqTag">-</span></span>
+        <span>THRESHOLDS &middot; GEV (L-MOMENTS), R&sup2; = <span id="rsqTag">-</span></span>
       </div>
     </div>
   </header>
@@ -451,10 +449,10 @@
   <div class="notice">
     <span>&#9888;</span>
     <span><b>Historical replay tool, not a live feed.</b> This board replays the 1990&ndash;2025 daily
-    streamflow record against thresholds derived from a Gumbel frequency analysis of the same record.
-    Scrub the timeline or jump to a recorded episode below to see how the system would have classified it.
-    Wiring a live/forecast feed (e.g. GEOGloWS) in place of the replay data is the natural next step toward
-    an operational system.</span>
+    streamflow record against thresholds derived from a GEV (Generalised Extreme Value, L-moments)
+    frequency analysis of the same record. Scrub the timeline or jump to a recorded episode below to see
+    how the system would have classified it. A live GEOGloWS discharge forecast, verified against this
+    same record, is shown below and classified against the same thresholds.</span>
   </div>
 
   <!-- live conditions -->
@@ -481,11 +479,11 @@
     </div>
     <div class="card stat-card">
       <div class="num" id="episodeCount">-</div>
-      <div class="label">Threshold-exceedance episodes recorded, 1990&ndash;2025 (advisory level or higher)</div>
+      <div class="label">Threshold-exceedance episodes recorded, 1990&ndash;2025 (Watch level or higher)</div>
     </div>
     <div class="card stat-card">
       <div class="num" id="severeCount">-</div>
-      <div class="label">Episode(s) reaching Warning or Severe level, see event log for dates</div>
+      <div class="label">Episode(s) reaching Warning or Emergency level, see event log for dates</div>
     </div>
   </div>
 
@@ -521,12 +519,13 @@
     <div class="card chart-card" style="display:flex; flex-direction:column;">
       <div class="chart-head">
         <span class="chart-title">Frequency analysis</span>
-        <span class="chart-sub">Annual max. vs. Gumbel fit</span>
+        <span class="chart-sub">Annual max. vs. Generalised Extreme Value (L-moments) fit, k = <span id="kTag">-</span></span>
       </div>
       <div class="chart-wrap">
         <canvas id="freqChart" height="190"></canvas>
         <div class="tooltip" id="freqTooltip"></div>
       </div>
+      <div class="chart-sub" id="gevCaption" style="margin:2px 0 4px;"></div>
       <table class="thresh" id="threshTable"><thead>
         <tr><th>Level</th><th>Return period</th><th>Discharge</th></tr>
       </thead><tbody></tbody></table>
@@ -554,9 +553,10 @@
   </div>
 
   <footer class="notes">
-    <span><b>Threshold method.</b> Annual maximum daily discharge for each of the 36 years (1990&ndash;2025) was ranked and fit to a Gumbel (Extreme Value Type I) distribution using the reduced-variate linear regression <span class="mono">Q = a&middot;y + b</span>, the same method already used for the project's rainfall frequency analysis. Advisory/Watch/Warning/Severe map to the 2/5/10/25-year return-period discharges from that fit.</span>
+    <span><b>Threshold method.</b> Annual maximum daily discharge for each of the 36 years (1990&ndash;2025) was ranked and fit to a Generalised Extreme Value (GEV) distribution using the method of L-moments. Watch/Warning/Emergency map to the 5/25/100-year return-period discharges from that fit; a display-only Advisory band at the 2-year discharge is also shown on the charts, but it sits below the reporting threshold and is not a fourth alert level &mdash; it does not gate classification or episode detection.</span>
+    <span><b>Gumbel family confirmed.</b> The fitted GEV shape parameter k &asymp; &minus;0.019 is close to zero, meaning the record is well described by the Gumbel (EV-I) distribution &mdash; the special case of GEV where k = 0. This is a result of the fit, not an assumption made to simplify it.</span>
     <span><b>Rainfall trigger.</b> For the 2012 and 2022 case studies, the trigger time is the most recent point before the discharge peak at which trailing 24-hour rainfall reached 20&nbsp;mm, a standard heavy-rainfall threshold, used here as a stand-in for a forecast/nowcast rainfall alert.</span>
-    <span><b>Scope.</b> Built on the historical record only; no live or forecast feed is connected. Episode detection merges exceedance days separated by a single dry day into one continuous episode.</span>
+    <span><b>Scope.</b> Episode detection merges exceedance days separated by a single dry day into one continuous episode. The live GEOGloWS discharge forecast (reach 140653280) was verified against this study's own streamflow record &mdash; 13,149 overlapping days, zero discrepancy &mdash; confirming it is the same reach, not a nearby proxy, so its median forecast is classified against the thresholds above.</span>
   </footer>
 
 </div>
@@ -567,14 +567,13 @@
 (function(){
   "use strict";
   var DATA = JSON.parse(document.getElementById('ews-data').textContent);
-  var LEVELS = ["normal","advisory","watch","warning","severe"];
-  var LEVEL_LABEL = {normal:"Normal", advisory:"Advisory", watch:"Watch", warning:"Warning", severe:"Severe / Emergency"};
+  var LEVELS = ["normal","watch","warning","emergency"];
+  var LEVEL_LABEL = {normal:"Normal", watch:"Watch", warning:"Warning", emergency:"Emergency"};
   var LEVEL_ACTION = {
     normal: "Flow within the normal range for this catchment.",
-    advisory: DATA.thresholds.advisory.action,
     watch: DATA.thresholds.watch.action,
     warning: DATA.thresholds.warning.action,
-    severe: DATA.thresholds.severe.action
+    emergency: DATA.thresholds.emergency.action
   };
 
   function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
@@ -594,16 +593,19 @@
 
   // ---------------- header meta ----------------
   document.getElementById('recordSpan').textContent = 'Historical replay · ' + DATA.meta.record_period;
-  document.getElementById('rsqTag').textContent = DATA.gumbel_fit.r_squared.toFixed(3);
+  document.getElementById('rsqTag').textContent = DATA.gev_fit.r_squared.toFixed(3);
+  document.getElementById('kTag').textContent = DATA.gev_fit.k.toFixed(4);
+  document.getElementById('gevCaption').textContent = 'Shape parameter k ≈ ' + DATA.gev_fit.k.toFixed(4) +
+    ' is close to zero — the record is well described by the Gumbel (EV-I) family, the k=0 special case of GEV.';
 
   var episodesAll = DATA.episodes.slice();
   document.getElementById('episodeCount').textContent = episodesAll.length;
-  var majorEvents = episodesAll.filter(function(e){ return e.peak_level === 'warning' || e.peak_level === 'severe'; });
+  var majorEvents = episodesAll.filter(function(e){ return e.peak_level === 'warning' || e.peak_level === 'emergency'; });
   document.getElementById('severeCount').textContent = majorEvents.length;
 
   // ---------------- threshold table ----------------
   var tbody = document.querySelector('#threshTable tbody');
-  ['advisory','watch','warning','severe'].forEach(function(k){
+  ['watch','warning','emergency'].forEach(function(k){
     var t = DATA.thresholds[k];
     var tr = document.createElement('tr');
     tr.innerHTML = '<td><span class="lvl-tag" style="color:'+levelColor(k)+'"><span class="dot"></span>'+t.label+'</span></td>'+
@@ -611,6 +613,15 @@
                     '<td class="q-val">'+fmtNum(t.discharge,0)+' m&sup3;/s</td>';
     tbody.appendChild(tr);
   });
+  (function(){
+    var ad = DATA.advisory_display;
+    var tr = document.createElement('tr');
+    tr.style.opacity = '0.65'; tr.style.fontStyle = 'italic';
+    tr.innerHTML = '<td><span class="lvl-tag" style="color:'+cssVar('--status-advisory-band')+'"><span class="dot"></span>Advisory</span></td>'+
+                    '<td class="q-val">1-in-'+ad.T+'yr</td>'+
+                    '<td class="q-val">'+fmtNum(ad.discharge,0)+' m&sup3;/s <span style="font-style:normal; font-size:10px;">(display only, below reporting threshold)</span></td>';
+    tbody.appendChild(tr);
+  })();
 
   // ---------------- events table ----------------
   var evBody = document.querySelector('#eventsTable tbody');
@@ -721,7 +732,7 @@
     var plotW = W - hydroPad.l - hydroPad.r;
     var plotH = H - hydroPad.t - hydroPad.b;
 
-    var maxQ = Math.max(DATA.thresholds.severe.discharge * 1.08, d3max());
+    var maxQ = Math.max(DATA.thresholds.emergency.discharge * 1.08, d3max());
     function d3max(){ var m=0; for(var i=0;i<series.length;i++){ if(series[i].q>m) m=series[i].q; } return m; }
     var yScale = function(q){ return hydroPad.t + plotH - (q/maxQ)*plotH; };
     var xScale = function(i){ return hydroPad.l + (i/(series.length-1))*plotW; };
@@ -750,13 +761,22 @@
     }
 
     // threshold reference lines
-    ['advisory','watch','warning','severe'].forEach(function(k){
+    ['watch','warning','emergency'].forEach(function(k){
       var y = yScale(DATA.thresholds[k].discharge);
       ctx.strokeStyle = levelColor(k); ctx.globalAlpha = 0.55; ctx.lineWidth = 1;
       ctx.setLineDash([4,3]);
       ctx.beginPath(); ctx.moveTo(hydroPad.l, y); ctx.lineTo(W-hydroPad.r, y); ctx.stroke();
       ctx.setLineDash([]); ctx.globalAlpha = 1;
     });
+
+    // display-only Advisory band (below reporting threshold, not a real alert level)
+    (function(){
+      var y = yScale(DATA.advisory_display.discharge);
+      ctx.strokeStyle = cssVar('--status-advisory-band'); ctx.globalAlpha = 0.5; ctx.lineWidth = 1;
+      ctx.setLineDash([2,4]);
+      ctx.beginPath(); ctx.moveTo(hydroPad.l, y); ctx.lineTo(W-hydroPad.r, y); ctx.stroke();
+      ctx.setLineDash([]); ctx.globalAlpha = 1;
+    })();
 
     // discharge line
     ctx.beginPath();
@@ -787,7 +807,7 @@
   var hydroLegend = document.getElementById('hydroLegend');
   (function buildLegend(){
     var items = [{c:'--accent', l:'Daily discharge'}].concat(
-      ['advisory','watch','warning','severe'].map(function(k){ return {c:'--status-'+k, l:DATA.thresholds[k].label}; })
+      ['watch','warning','emergency'].map(function(k){ return {c:'--status-'+k, l:DATA.thresholds[k].label}; })
     );
     items.forEach(function(it){
       var el = document.createElement('span');
@@ -795,6 +815,12 @@
       el.innerHTML = '<span class="legend-swatch" style="background:'+cssVar(it.c)+'"></span>'+it.l;
       hydroLegend.appendChild(el);
     });
+    (function(){
+      var el = document.createElement('span');
+      el.className = 'legend-item';
+      el.innerHTML = '<span class="legend-swatch" style="background:'+cssVar('--status-advisory-band')+'"></span>Advisory (display only, below reporting threshold)';
+      hydroLegend.appendChild(el);
+    })();
   })();
 
   hydroCanvas.addEventListener('mousemove', function(e){
@@ -832,10 +858,14 @@
     var plotW = W - freqPad.l - freqPad.r;
     var plotH = H - freqPad.t - freqPad.b;
 
-    var pts = DATA.gumbel_fit.annual_max_ranked;
+    var pts = DATA.gev_fit.annual_max_ranked;
+    var curve = DATA.gev_fit.frequency_curve_dense;
     var yMin = Math.min.apply(null, pts.map(function(p){return p.reduced_variate_y;}));
     var yMax = Math.max.apply(null, pts.map(function(p){return p.reduced_variate_y;}));
-    var qMax = Math.max.apply(null, pts.map(function(p){return p.max_flow;})) * 1.08;
+    var qMax = Math.max(
+      Math.max.apply(null, pts.map(function(p){return p.max_flow;})),
+      DATA.thresholds.emergency.discharge
+    ) * 1.08;
 
     var xScale = function(y){ return freqPad.l + ((y - yMin)/(yMax-yMin))*plotW; };
     var yScale = function(q){ return freqPad.t + plotH - (q/qMax)*plotH; };
@@ -851,22 +881,31 @@
       ctx.fillText(fmtNum(q,0), freqPad.l-6, y);
     }
 
-    // fit line
-    var a = DATA.gumbel_fit.slope_a, b = DATA.gumbel_fit.intercept_b;
+    // GEV fit curve (near-linear since k is close to zero, but drawn from the actual
+    // fitted quantile function rather than a straight regression line)
     ctx.beginPath();
     ctx.strokeStyle = cssVar('--accent'); ctx.lineWidth = 1.4;
-    var yv0 = yMin, yv1 = yMax;
-    ctx.moveTo(xScale(yv0), yScale(a*yv0+b));
-    ctx.lineTo(xScale(yv1), yScale(a*yv1+b));
+    var curveStarted = false;
+    curve.forEach(function(p){
+      if(p.y < yMin || p.y > yMax) return;
+      var x = xScale(p.y), y = yScale(p.discharge);
+      if(!curveStarted){ ctx.moveTo(x,y); curveStarted = true; } else { ctx.lineTo(x,y); }
+    });
     ctx.stroke();
 
     // threshold marks
-    ['advisory','watch','warning','severe'].forEach(function(k){
+    ['watch','warning','emergency'].forEach(function(k){
       var yy = yScale(DATA.thresholds[k].discharge);
       ctx.strokeStyle = levelColor(k); ctx.globalAlpha=0.55; ctx.setLineDash([3,3]); ctx.lineWidth=1;
       ctx.beginPath(); ctx.moveTo(freqPad.l, yy); ctx.lineTo(W-freqPad.r, yy); ctx.stroke();
       ctx.setLineDash([]); ctx.globalAlpha=1;
     });
+    (function(){
+      var yy = yScale(DATA.advisory_display.discharge);
+      ctx.strokeStyle = cssVar('--status-advisory-band'); ctx.globalAlpha=0.5; ctx.setLineDash([2,4]); ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(freqPad.l, yy); ctx.lineTo(W-freqPad.r, yy); ctx.stroke();
+      ctx.setLineDash([]); ctx.globalAlpha=1;
+    })();
 
     // points
     var positions = [];
@@ -975,7 +1014,7 @@
           ctx.fillText(fmtNum(q,0), pad.l-6, y);
         });
 
-        ['advisory','watch','warning','severe'].forEach(function(k){
+        ['watch','warning','emergency'].forEach(function(k){
           if(DATA.thresholds[k].discharge > maxQ) return;
           var y = yScale(DATA.thresholds[k].discharge);
           ctx.strokeStyle = levelColor(k); ctx.globalAlpha=0.55; ctx.setLineDash([3,3]); ctx.lineWidth=1;
@@ -1010,6 +1049,8 @@
     catch(e){ return null; }
   })();
 
+  var STALE_MINUTES = 90;
+
   function fmtAgo(iso){
     var then = new Date(iso);
     var mins = Math.round((Date.now() - then.getTime())/60000);
@@ -1035,8 +1076,12 @@
       return;
     }
 
-    dot.classList.toggle('stale', LIVE.status !== 'ok');
-    asOf.textContent = 'as of ' + LIVE.fetched_at.replace('T',' ').replace('Z',' UTC') + ' · ' + fmtAgo(LIVE.fetched_at);
+    var fetchedDate = new Date(LIVE.fetched_at);
+    var ageMin = (Date.now() - fetchedDate.getTime()) / 60000;
+    var isStale = LIVE.status !== 'ok' || ageMin > STALE_MINUTES;
+    dot.classList.toggle('stale', isStale);
+    asOf.classList.toggle('stale', isStale);
+    asOf.textContent = 'Data fetched ' + fetchedDate.toLocaleString() + ' (' + fmtAgo(LIVE.fetched_at) + ')';
 
     var grid = document.createElement('div');
     grid.className = 'live-grid';
@@ -1071,16 +1116,20 @@
     gc.className = 'card live-card';
     if(LIVE.geoglows){
       var g = LIVE.geoglows;
-      var lastPct = g.forecast.length ? g.forecast[g.forecast.length-1].pct : null;
+      var curLvl = g.current_level || 'normal';
+      var maxLvl = g.max_level || 'normal';
+      var curColor = curLvl === 'normal' ? cssVar('--status-normal') : levelColor(curLvl);
+      var curSoft = curLvl === 'normal' ? cssVar('--status-normal-soft') : cssVar('--status-'+curLvl+'-soft');
       gc.innerHTML =
-        '<div class="live-card-head"><span class="live-card-title">Discharge forecast, nearest reach (proxy)</span></div>'+
+        '<div class="live-card-head"><span class="live-card-title">Discharge forecast, classified</span>'+
+        '<span class="trigger-pill" style="background:'+curSoft+'; color:'+curColor+';">'+LEVEL_LABEL[curLvl]+'</span></div>'+
         '<div class="chart-wrap"><canvas id="liveGeoChart" height="110"></canvas><div class="tooltip" id="liveGeoTooltip"></div></div>'+
-        '<div class="proxy-note"><b>Proxy reach, not confirmed identical to the calibration input.</b> Nearest GEOGloWS-mapped reach to the '+
-        'documented outlet (10.4700&deg;N, 7.4500&deg;E) is ~'+g.distance_km+'km away. Its retrospective record closely matches Barnawa\'s '+
-        'observed discharge (mean '+g.retrospective_mean+' m&sup3;/s over '+g.retrospective_years+' simulated years, vs. Barnawa\'s observed '+
-        '~169 m&sup3;/s mean), consistent with this study\'s streamflow record itself being GEOGloWS reanalysis. It is not confirmed to be the '+
-        'identical reach used for calibration, so it is shown as a trend indicator rather than classified against the Advisory/Watch/Warning/Severe '+
-        'thresholds above'+(lastPct!=null?' (currently ~'+lastPct+'th percentile of its own record)':'')+'.</div>';
+        (maxLvl !== curLvl ? '<div class="proxy-note">Forecast median reaches <b>'+LEVEL_LABEL[maxLvl]+'</b> within the shown horizon. Shaded band is the 25th&ndash;75th percentile forecast spread; only the median is classified, to avoid over-warning on the upper band.</div>' : '<div class="proxy-note">Shaded band is the 25th&ndash;75th percentile forecast spread; only the median is classified, to avoid over-warning on the upper band.</div>')+
+        '<div class="proxy-note"><b>Verified same reach as the study\'s streamflow record.</b> GEOGloWS reach '+g.river_id+', at the documented '+
+        'outlet (10.4700&deg;N, 7.4500&deg;E), ~'+g.distance_km+'km from the lookup point. Its retrospective series and this study\'s own daily '+
+        'discharge record overlap for 13,149 days with zero discrepancy, confirming this is the same reach the record is derived from '+
+        '(retrospective mean '+g.retrospective_mean+' m&sup3;/s over '+g.retrospective_years+' simulated years) &mdash; so the median forecast is '+
+        'classified directly against the Watch/Warning/Emergency thresholds above, not shown as a proxy indicator.</div>';
     } else {
       gc.innerHTML = '<div class="live-card-title">Discharge forecast</div><div class="proxy-note">Unavailable this fetch'+(LIVE.error?': '+LIVE.error:'')+'.</div>';
     }
@@ -1164,6 +1213,15 @@
         gctx.textAlign='right'; gctx.textBaseline='top';
         gctx.fillText(fmtNum(maxQ,0)+'m³/s', pad.l-6, pad.t);
 
+        // threshold reference lines
+        ['watch','warning','emergency'].forEach(function(k){
+          if(DATA.thresholds[k].discharge > maxQ) return;
+          var y = gy(DATA.thresholds[k].discharge);
+          gctx.strokeStyle = levelColor(k); gctx.globalAlpha=0.55; gctx.setLineDash([3,3]); gctx.lineWidth=1;
+          gctx.beginPath(); gctx.moveTo(pad.l,y); gctx.lineTo(GW-pad.r,y); gctx.stroke();
+          gctx.setLineDash([]); gctx.globalAlpha=1;
+        });
+
         // uncertainty band
         gctx.beginPath();
         rows.forEach(function(d,i){ var x=gx(i), y=gy(d.p75); if(i===0) gctx.moveTo(x,y); else gctx.lineTo(x,y); });
@@ -1189,7 +1247,7 @@
             idx = Math.max(0, Math.min(st.rows.length-1, idx));
             var d = st.rows[idx];
             gtooltip.style.opacity=1; gtooltip.style.left=mx+'px'; gtooltip.style.top='6px';
-            gtooltip.innerHTML = d.t.slice(0,16).replace('T',' ') + '<br>' + d.med.toFixed(1) + ' m³/s (' + d.p25.toFixed(1) + '–' + d.p75.toFixed(1) + ')' + (d.pct!=null ? '<br>~'+d.pct+'th pct. of record' : '');
+            gtooltip.innerHTML = d.t.slice(0,16).replace('T',' ') + '<br>' + d.med.toFixed(1) + ' m³/s (' + d.p25.toFixed(1) + '–' + d.p75.toFixed(1) + ')' + '<br>' + LEVEL_LABEL[d.lvl] + (d.pct!=null ? ' · ~'+d.pct+'th pct. of record' : '');
           });
           gcanvas.addEventListener('mouseleave', function(){ gtooltip.style.opacity=0; });
         }

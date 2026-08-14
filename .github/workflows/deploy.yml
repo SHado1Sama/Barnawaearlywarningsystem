@@ -5,10 +5,10 @@ on:
     - cron: "*/30 * * * *"
   push:
     branches: [main]
-  workflow_dispatch: {}
+  workflow_dispatch: {}   # manual "Run workflow" button - forces a fresh build/deploy on demand
 
 permissions:
-  contents: read
+  contents: write   # write needed for the monthly heartbeat commit below
   pages: write
   id-token: write
 
@@ -28,6 +28,24 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      # GitHub disables scheduled workflows on a repo after 60 days with no other
+      # repo activity. A push/workflow_dispatch resets that clock, but a schedule-only
+      # run does not, so on the first scheduled run of each UTC month this makes a
+      # trivial commit to keep the schedule alive indefinitely.
+      - name: Monthly heartbeat commit (keeps the 30-min schedule from being disabled)
+        if: github.event_name == 'schedule'
+        run: |
+          if [ "$(date -u +%d)" = "01" ]; then
+            date -u +%Y-%m-%dT%H:%M:%SZ > .heartbeat
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add .heartbeat
+            if ! git diff --cached --quiet; then
+              git commit -m "chore: monthly heartbeat (keep scheduled workflow active)"
+              git push
+            fi
+          fi
 
       - name: Fetch live conditions
         run: python live_fetch.py

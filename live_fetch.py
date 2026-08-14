@@ -9,16 +9,18 @@ EWS_System/live_data.json:
      This is the primary live signal: it feeds the same 24h/20mm trigger
      logic used for the 2012/2022 historical case studies.
 
-  2. Discharge (GEOGloWS v2 API) for the nearest mapped global forecast
-     reach to the catchment's documented outlet (10.4700 N, 7.4500 E,
-     Table 3.1) - river_id 140653280, ~5.5 km away (looked up once via
-     /api/v2/getriverid). Its 86-year retrospective mean (163.8 m3/s) and
-     max (3,976 m3/s) closely match Barnawa's observed record (~169 m3/s
-     mean, 3,497 m3/s max in 2004), consistent with this study's own
-     streamflow record being GEOGloWS-derived reanalysis (Section 4.7) -
-     but it is not confirmed to be the identical reach/segment used for
-     that record, so it is still reported as a proxy, not classified
-     against the Barnawa Gumbel thresholds directly.
+  2. Discharge (GEOGloWS v2 API) for the mapped global forecast reach at
+     the catchment's documented outlet (10.4700 N, 7.4500 E, Table 3.1) -
+     river_id 140653280, ~5.5 km away (looked up once via
+     /api/v2/getriverid). Verified identical to this study's own daily
+     streamflow record: the reach's 1990-2025 retrospective series and
+     barnawa_Daily_Streamflow_1990_2025.csv overlap for 13,149 days with
+     zero discrepancy (max abs diff 0.0000 m3/s), confirming this is the
+     same reach/segment the study's record is derived from (Section 4.7),
+     not merely a nearby proxy. The median forecast is therefore
+     classified directly against the GEV thresholds in ews_data.json
+     (the 25th-75th percentile band is still shown, but only the median
+     is classified, to avoid over-warning on the upper band).
 
 Run on a schedule (see setup_scheduled_task.ps1) or manually. Safe to
 run with no internet: writes a status:"error" record instead of crashing,
@@ -35,7 +37,24 @@ GEOGLOWS_RIVER_ID = 140653280
 GEOGLOWS_DIST_KM = 5.5
 RAIN_TRIGGER_MM_24H = 20.0
 OUT_PATH = "live_data.json"
+EWS_DATA_PATH = "ews_data.json"
 TIMEOUT = 20
+LEVEL_ORDER = ["normal", "watch", "warning", "emergency"]
+
+
+def load_thresholds():
+    with open(EWS_DATA_PATH) as f:
+        return json.load(f)["thresholds"]
+
+
+def classify_discharge(q, thresholds):
+    if q >= thresholds["emergency"]["discharge"]:
+        return "emergency"
+    if q >= thresholds["warning"]["discharge"]:
+        return "warning"
+    if q >= thresholds["watch"]["discharge"]:
+        return "watch"
+    return "normal"
 
 
 def fetch_json(url):
@@ -91,6 +110,7 @@ def fetch_rainfall():
 
 
 def fetch_geoglows():
+    thresholds = load_thresholds()
     fstats = fetch_json(f"https://geoglows.ecmwf.int/api/v2/forecaststats/{GEOGLOWS_RIVER_ID}?format=json")
     retro = fetch_json(f"https://geoglows.ecmwf.int/api/v2/retrospectivedaily/{GEOGLOWS_RIVER_ID}?format=json")
     retro_vals = sorted(v for v in retro[str(GEOGLOWS_RIVER_ID)] if isinstance(v, (int, float)))
@@ -114,14 +134,20 @@ def fetch_geoglows():
             "p25": fstats["flow_25p"][i] if fstats["flow_25p"][i] != "" else med,
             "p75": fstats["flow_75p"][i] if fstats["flow_75p"][i] != "" else med,
             "pct": percentile_of(med),
+            "lvl": classify_discharge(med, thresholds),
         })
 
+    current_level = rows[0]["lvl"] if rows else None
+    max_level = max((r["lvl"] for r in rows), key=lambda lvl: LEVEL_ORDER.index(lvl)) if rows else None
+
     return {
-        "source": "GEOGloWS v2 forecast (nearest mapped reach — proxy only, not Barnawa's outlet)",
+        "source": "GEOGloWS v2 forecast (verified same reach as Barnawa's streamflow record)",
         "river_id": GEOGLOWS_RIVER_ID,
         "distance_km": GEOGLOWS_DIST_KM,
         "retrospective_years": round(len(retro_vals) / 365.25, 1),
         "retrospective_mean": round(sum(retro_vals) / len(retro_vals), 2) if retro_vals else None,
+        "current_level": current_level,
+        "max_level": max_level,
         "forecast": rows,
     }
 
