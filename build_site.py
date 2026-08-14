@@ -28,6 +28,7 @@ replacements = {
     "__PLEXMONO400_B64__": b64_of("fonts/plexmono400.woff2"),
     "__PLEXMONO500_B64__": b64_of("fonts/plexmono500.woff2"),
     "__PLEXMONO600_B64__": b64_of("fonts/plexmono600.woff2"),
+    "__MAP_OVERVIEW_B64__": b64_of("maps/overview.png"),
     "__EWS_DATA_JSON__": data_json,
     "__LIVE_DATA_JSON__": live_json,
 }

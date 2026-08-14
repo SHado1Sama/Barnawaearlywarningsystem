@@ -491,6 +491,15 @@
   }
   .param-chip b{color:var(--ink);}
 
+  /* ---- catchment map ---- */
+  .map-card{margin-bottom:18px;}
+  .map-img{width:100%; height:auto; display:block; border-radius:8px; border:1px solid var(--line); background:var(--surface-raised);}
+  .map-caption{font-size:12px; color:var(--ink-soft); line-height:1.6; margin:10px 0 0; max-width:90ch;}
+  .map-thumb-card{display:flex; gap:14px; align-items:center; padding:14px 16px;}
+  .map-thumb-card .map-img{width:120px; height:auto; flex:none; border-radius:6px;}
+  .map-thumb-card .map-thumb-text{font-size:12px; color:var(--ink-soft); line-height:1.55;}
+  .map-thumb-card .map-thumb-text b{color:var(--ink); font-family:'Archivo',sans-serif; font-size:13px; display:block; margin-bottom:3px;}
+
   footer.notes{
     margin-top:30px;
     padding-top:16px;
@@ -566,6 +575,15 @@
 
     <p class="hero-forecast" id="heroForecast"></p>
 
+    <div class="card map-thumb-card">
+      <img class="map-img" id="mapThumb" alt="Locator map of the Barnawa catchment, Kaduna">
+      <div class="map-thumb-text">
+        <b>Barnawa catchment, Kaduna State, Nigeria</b>
+        This system covers the ~3,809&nbsp;km&sup2; basin draining to the Barnawa outlet; the deep-colored
+        area is the flood-modeled footprint these alert levels are built around.
+      </div>
+    </div>
+
     <button class="ctrl detail-toggle" id="detailToggleBtn" type="button">&#9662; Show live data detail (charts)</button>
     <div id="liveBody" style="display:none;"></div>
 
@@ -591,6 +609,21 @@
       frequency analysis of the same record, and explains how those thresholds and the live forecast
       classification were built. Scrub the timeline or jump to a recorded episode below to see how the
       system would have classified it. For current conditions, use the Live conditions tab above.</span>
+    </div>
+
+    <!-- catchment map -->
+    <div class="card map-card">
+      <div class="chart-head" style="margin-bottom:8px;">
+        <span class="chart-title">Where this is</span>
+        <span class="chart-sub">Contributing basin vs. the flood-modeled Barnawa footprint</span>
+      </div>
+      <img class="map-img" id="mapOverview" src="data:image/png;base64,__MAP_OVERVIEW_B64__" alt="Map of the Barnawa contributing basin (pale) with the flood-modeled Barnawa footprint highlighted in deep teal">
+      <p class="map-caption">The pale outline is the full ~3,809&nbsp;km&sup2; basin that drains to the catchment
+      outlet used for this study's 36-year discharge record. The deep teal shape is not an administrative
+      boundary &mdash; no such file exists for this project &mdash; it is the real, data-derived footprint of
+      every grid cell with a modeled 100-year flood depth (the largest of the five modeled storms, and a
+      superset of the 5/10/25/50-year footprints), i.e. the area this system actually exists to warn about.
+      Its winding shape traces the main drainage channel.</p>
     </div>
 
     <div class="eyebrow" style="margin-bottom:10px;">Historical replay &middot; <span id="recordSpan">1990&ndash;2025</span> &middot; GEV (L-moments), R&sup2; = <span id="rsqTag">-</span></div>
@@ -1552,6 +1585,7 @@
 
   buildLivePanel();
   buildHeroPanel();
+  document.getElementById('mapThumb').src = document.getElementById('mapOverview').src;
 
   // ---------------- live detail toggle ----------------
   var detailBtn = document.getElementById('detailToggleBtn');
