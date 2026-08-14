@@ -406,6 +406,91 @@
     background:var(--surface-sunken); padding:2px 6px; border-radius:4px;
   }
 
+  /* ---- view switching ---- */
+  .view-tabs{display:flex; gap:4px; background:var(--surface-raised); border:1px solid var(--line-strong); border-radius:100px; padding:3px;}
+  .view-tab{
+    font-family:'IBM Plex Mono', monospace; font-size:11.5px; font-weight:600; letter-spacing:0.03em;
+    text-transform:uppercase; border:none; background:transparent; color:var(--ink-soft);
+    padding:7px 14px; border-radius:100px; cursor:pointer;
+  }
+  .view-tab.active{background:var(--accent); color:var(--on-accent);}
+  .view-tab:hover:not(.active){color:var(--accent-deep);}
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .back-link{
+    display:inline-flex; align-items:center; gap:6px; margin-bottom:16px;
+    font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--accent-deep);
+    background:none; border:none; cursor:pointer; padding:0;
+  }
+  .back-link:hover{text-decoration:underline;}
+
+  /* ---- hero banner (live view) ---- */
+  .hero-banner{
+    border-radius:14px; padding:26px 28px; margin-bottom:18px;
+    background:var(--status-normal-soft); border:1px solid var(--line);
+  }
+  .hero-banner[data-level="watch"]{background:var(--status-watch-soft);}
+  .hero-banner[data-level="warning"]{background:var(--status-warning-soft);}
+  .hero-banner[data-level="emergency"]{background:var(--status-emergency-soft);}
+  .hero-top{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;}
+  .hero-eyebrow{font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-soft);}
+  .hero-level{display:flex; align-items:center; gap:12px; margin-bottom:10px;}
+  .hero-level .live-dot{width:14px; height:14px; flex:none;}
+  .hero-level span#heroLevelText{
+    font-family:'Archivo',sans-serif; font-weight:900; font-size:clamp(32px,6vw,52px); line-height:1;
+    letter-spacing:-0.01em; color:var(--ink);
+  }
+  .hero-explain{font-size:15.5px; color:var(--ink-soft); max-width:62ch; margin:0 0 10px;}
+  .hero-action{font-size:14px; font-weight:600; color:var(--ink); margin:0;}
+  .hero-forecast{
+    font-size:13.5px; color:var(--ink-soft); background:var(--surface-raised); border:1px solid var(--line);
+    border-radius:8px; padding:10px 14px; margin:16px 0 18px; max-width:84ch;
+  }
+  .hero-forecast b{color:var(--ink);}
+
+  .readout-card{display:flex; flex-direction:column; gap:2px; justify-content:center;}
+  .readout-card .num{font-family:'Archivo',sans-serif; font-weight:900; font-size:32px; line-height:1;}
+  .readout-card .num small{font-family:'IBM Plex Mono',monospace; font-size:14px; font-weight:500; color:var(--ink-faint); margin-left:4px;}
+  .readout-card .label{font-size:12px; color:var(--ink-soft);}
+  .readout-card .sub{font-size:10.5px; color:var(--ink-faint); margin-top:2px;}
+
+  .detail-toggle{margin:4px 0 18px;}
+
+  .cta-card{
+    display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;
+    margin:22px 0 4px; padding:18px 20px; border-radius:12px;
+    background:var(--surface-raised); border:1px dashed var(--line-strong);
+  }
+  .cta-title{font-family:'Archivo',sans-serif; font-weight:700; font-size:15px; margin-bottom:4px;}
+  .cta-sub{font-size:12.5px; color:var(--ink-soft); max-width:52ch;}
+
+  /* ---- methodology (history view) ---- */
+  .method-section{margin-top:28px;}
+  .method-intro{font-size:13.5px; color:var(--ink-soft); max-width:78ch; margin:8px 0 16px; line-height:1.6;}
+  .step-list{display:flex; flex-direction:column; gap:12px;}
+  .step-card{display:flex; gap:14px; padding:16px 18px;}
+  .step-num{
+    flex:none; width:30px; height:30px; border-radius:50%;
+    background:var(--accent-soft); color:var(--accent-deep);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12.5px;
+  }
+  .step-body{min-width:0;}
+  .step-body h3{font-family:'Archivo',sans-serif; font-weight:700; font-size:14.5px; margin:2px 0 6px;}
+  .step-body p{font-size:13px; color:var(--ink-soft); margin:0 0 8px; line-height:1.65;}
+  .step-body p:last-child{margin-bottom:0;}
+  .formula{
+    display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:12px;
+    background:var(--surface-sunken); padding:3px 8px; border-radius:5px; margin:2px 0;
+  }
+  .param-row{display:flex; gap:10px; flex-wrap:wrap; margin:8px 0;}
+  .param-chip{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; background:var(--surface-sunken);
+    border:1px solid var(--line); border-radius:6px; padding:6px 10px;
+  }
+  .param-chip b{color:var(--ink);}
+
   footer.notes{
     margin-top:30px;
     padding-top:16px;
@@ -435,131 +520,276 @@
     <div class="titleblock">
       <span class="eyebrow">Barnawa Catchment &middot; Kaduna, Nigeria</span>
       <h1>Early Warning System</h1>
-      <span class="eyebrow" id="recordSpan">Historical replay &middot; 1990&ndash;2025</span>
     </div>
-    <div style="display:flex; align-items:flex-end; gap:14px;">
+    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+      <nav class="view-tabs" id="viewTabs">
+        <button class="view-tab active" data-view="live" type="button">Live conditions</button>
+        <button class="view-tab" data-view="history" type="button">Historical record &amp; methodology</button>
+      </nav>
       <button class="theme-toggle" id="themeToggle" type="button">Theme: Auto</button>
-      <div class="meta">
-        <span>36-YR DAILY DISCHARGE RECORD</span>
-        <span>THRESHOLDS &middot; GEV (L-MOMENTS), R&sup2; = <span id="rsqTag">-</span></span>
-      </div>
     </div>
   </header>
 
-  <div class="notice">
-    <span>&#9888;</span>
-    <span><b>Historical replay tool, not a live feed.</b> This board replays the 1990&ndash;2025 daily
-    streamflow record against thresholds derived from a GEV (Generalised Extreme Value, L-moments)
-    frequency analysis of the same record. Scrub the timeline or jump to a recorded episode below to see
-    how the system would have classified it. A live GEOGloWS discharge forecast, verified against this
-    same record, is shown below and classified against the same thresholds.</span>
-  </div>
+  <!-- ======================= LIVE VIEW (landing) ======================= -->
+  <section id="view-live" class="view active">
 
-  <!-- live conditions -->
-  <div class="live-section">
-    <div class="live-head">
-      <span class="live-dot" id="liveDot"></span>
-      <h2>Live conditions</h2>
-      <span class="live-asof" id="liveAsOf">-</span>
+    <div class="hero-banner" id="heroBanner" data-level="normal">
+      <div class="hero-top">
+        <span class="hero-eyebrow">Current status &middot; updated automatically every 30 minutes</span>
+        <span class="live-asof" id="liveAsOf">-</span>
+      </div>
+      <div class="hero-level">
+        <span class="live-dot" id="liveDot"></span>
+        <span id="heroLevelText">Checking&hellip;</span>
+      </div>
+      <p class="hero-explain" id="heroExplain">Loading current conditions for the Barnawa catchment&hellip;</p>
+      <p class="hero-action" id="heroAction"></p>
     </div>
-    <div id="liveBody"></div>
-  </div>
 
-  <!-- status board -->
-  <div class="board">
-    <div class="card status-card" id="statusCard">
+    <div class="board" id="liveReadouts">
+      <div class="card readout-card">
+        <div class="num" id="readoutFlow">-<small>m&sup3;/s</small></div>
+        <div class="label">River flow right now</div>
+        <div class="sub">Cubic metres of water passing the catchment outlet each second</div>
+      </div>
+      <div class="card readout-card">
+        <div class="num" id="readoutRain">-<small>mm</small></div>
+        <div class="label">Rainfall, last 24 hours</div>
+        <div class="sub">Heavy rain (&ge;20mm/24h) has preceded every flood in the record</div>
+      </div>
+      <div class="card readout-card">
+        <div class="num" id="readoutOutlook">-</div>
+        <div class="label">Forecast outlook</div>
+        <div class="sub" id="readoutOutlookSub">Highest level expected in the coming days</div>
+      </div>
+    </div>
+
+    <p class="hero-forecast" id="heroForecast"></p>
+
+    <button class="ctrl detail-toggle" id="detailToggleBtn" type="button">&#9662; Show live data detail (charts)</button>
+    <div id="liveBody" style="display:none;"></div>
+
+    <div class="cta-card">
       <div>
-        <span class="date-label" id="statusDate">-</span>
-        <div class="discharge" id="statusDischarge">-<small>m&sup3;/s</small></div>
+        <div class="cta-title">Want to see the flood record behind these numbers?</div>
+        <div class="cta-sub">36 years of daily river-flow data, exactly how the alert levels were calculated, and two real flood events analysed in detail.</div>
       </div>
-      <div>
-        <span class="level-chip" id="levelChip"><span class="dot"></span><span id="levelChipText">NORMAL</span></span>
-        <div class="action-text" id="actionText">Flow within the normal range for this catchment.</div>
-      </div>
-    </div>
-    <div class="card stat-card">
-      <div class="num" id="episodeCount">-</div>
-      <div class="label">Threshold-exceedance episodes recorded, 1990&ndash;2025 (Watch level or higher)</div>
-    </div>
-    <div class="card stat-card">
-      <div class="num" id="severeCount">-</div>
-      <div class="label">Episode(s) reaching Warning or Emergency level, see event log for dates</div>
-    </div>
-  </div>
-
-  <!-- scrubber -->
-  <div class="card scrubber-card">
-    <div class="scrubber-head">
-      <span class="scrubber-title">Timeline replay</span>
-      <div class="scrubber-controls">
-        <select class="jump" id="jumpSelect"></select>
-        <button class="ctrl" id="stepBack" type="button">&larr; 1y</button>
-        <button class="ctrl primary" id="playBtn" type="button">&#9654; Play</button>
-        <button class="ctrl" id="stepFwd" type="button">1y &rarr;</button>
-      </div>
-    </div>
-    <input type="range" id="scrub" min="0" max="100" value="0" step="1">
-    <div class="scrub-dates"><span id="scrubMin">1990-01-01</span><span id="scrubMax">2025-12-31</span></div>
-  </div>
-
-  <!-- main grid: hydrograph + frequency/threshold panel -->
-  <div class="main-grid">
-    <div class="card chart-card">
-      <div class="chart-head">
-        <span class="chart-title">Daily discharge, 1990&ndash;2025</span>
-        <span class="chart-sub">Hover to inspect &middot; drag the timeline above to move the cursor</span>
-      </div>
-      <div class="chart-wrap">
-        <canvas id="hydroChart" height="300"></canvas>
-        <div class="tooltip" id="hydroTooltip"></div>
-      </div>
-      <div class="legend-row" id="hydroLegend"></div>
+      <button class="ctrl primary" data-view="history" type="button">See historical record &amp; methodology &rarr;</button>
     </div>
 
-    <div class="card chart-card" style="display:flex; flex-direction:column;">
-      <div class="chart-head">
-        <span class="chart-title">Frequency analysis</span>
-        <span class="chart-sub">Annual max. vs. Generalised Extreme Value (L-moments) fit, k = <span id="kTag">-</span></span>
+  </section>
+
+  <!-- ======================= HISTORICAL / METHODOLOGY VIEW ======================= -->
+  <section id="view-history" class="view">
+
+    <button class="back-link" data-view="live" type="button">&larr; Back to live conditions</button>
+
+    <div class="notice">
+      <span>&#9888;</span>
+      <span><b>Historical replay, not a live feed.</b> This view replays the 1990&ndash;2025 daily
+      streamflow record against thresholds derived from a GEV (Generalised Extreme Value, L-moments)
+      frequency analysis of the same record, and explains how those thresholds and the live forecast
+      classification were built. Scrub the timeline or jump to a recorded episode below to see how the
+      system would have classified it. For current conditions, use the Live conditions tab above.</span>
+    </div>
+
+    <div class="eyebrow" style="margin-bottom:10px;">Historical replay &middot; <span id="recordSpan">1990&ndash;2025</span> &middot; GEV (L-moments), R&sup2; = <span id="rsqTag">-</span></div>
+
+    <!-- status board -->
+    <div class="board">
+      <div class="card status-card" id="statusCard">
+        <div>
+          <span class="date-label" id="statusDate">-</span>
+          <div class="discharge" id="statusDischarge">-<small>m&sup3;/s</small></div>
+        </div>
+        <div>
+          <span class="level-chip" id="levelChip"><span class="dot"></span><span id="levelChipText">NORMAL</span></span>
+          <div class="action-text" id="actionText">Flow within the normal range for this catchment.</div>
+        </div>
       </div>
-      <div class="chart-wrap">
-        <canvas id="freqChart" height="190"></canvas>
-        <div class="tooltip" id="freqTooltip"></div>
+      <div class="card stat-card">
+        <div class="num" id="episodeCount">-</div>
+        <div class="label">Threshold-exceedance episodes recorded, 1990&ndash;2025 (Watch level or higher)</div>
       </div>
-      <div class="chart-sub" id="gevCaption" style="margin:2px 0 4px;"></div>
-      <table class="thresh" id="threshTable"><thead>
-        <tr><th>Level</th><th>Return period</th><th>Discharge</th></tr>
+      <div class="card stat-card">
+        <div class="num" id="severeCount">-</div>
+        <div class="label">Episode(s) reaching Warning or Emergency level, see event log for dates</div>
+      </div>
+    </div>
+
+    <!-- scrubber -->
+    <div class="card scrubber-card">
+      <div class="scrubber-head">
+        <span class="scrubber-title">Timeline replay</span>
+        <div class="scrubber-controls">
+          <select class="jump" id="jumpSelect"></select>
+          <button class="ctrl" id="stepBack" type="button">&larr; 1y</button>
+          <button class="ctrl primary" id="playBtn" type="button">&#9654; Play</button>
+          <button class="ctrl" id="stepFwd" type="button">1y &rarr;</button>
+        </div>
+      </div>
+      <input type="range" id="scrub" min="0" max="100" value="0" step="1">
+      <div class="scrub-dates"><span id="scrubMin">1990-01-01</span><span id="scrubMax">2025-12-31</span></div>
+    </div>
+
+    <!-- main grid: hydrograph + frequency/threshold panel -->
+    <div class="main-grid">
+      <div class="card chart-card">
+        <div class="chart-head">
+          <span class="chart-title">Daily discharge, 1990&ndash;2025</span>
+          <span class="chart-sub">Hover to inspect &middot; drag the timeline above to move the cursor</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="hydroChart" height="300"></canvas>
+          <div class="tooltip" id="hydroTooltip"></div>
+        </div>
+        <div class="legend-row" id="hydroLegend"></div>
+      </div>
+
+      <div class="card chart-card" style="display:flex; flex-direction:column;">
+        <div class="chart-head">
+          <span class="chart-title">Frequency analysis</span>
+          <span class="chart-sub">Annual max. vs. Generalised Extreme Value (L-moments) fit, k = <span id="kTag">-</span></span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="freqChart" height="190"></canvas>
+          <div class="tooltip" id="freqTooltip"></div>
+        </div>
+        <div class="chart-sub" id="gevCaption" style="margin:2px 0 4px;"></div>
+        <table class="thresh" id="threshTable"><thead>
+          <tr><th>Level</th><th>Return period</th><th>Discharge</th></tr>
+        </thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- event log -->
+    <div class="card event-card">
+      <div class="chart-head" style="margin-bottom:8px;">
+        <span class="chart-title">Event log, all recorded episodes</span>
+        <span class="chart-sub">Click a row to move the replay there</span>
+      </div>
+      <table class="events" id="eventsTable"><thead>
+        <tr><th>Peak date</th><th>Level</th><th>Peak discharge</th><th>Duration</th></tr>
       </thead><tbody></tbody></table>
     </div>
-  </div>
 
-  <!-- event log -->
-  <div class="card event-card">
-    <div class="chart-head" style="margin-bottom:8px;">
-      <span class="chart-title">Event log, all recorded episodes</span>
-      <span class="chart-sub">Click a row to move the replay there</span>
+    <!-- case studies -->
+    <div class="case-section">
+      <div class="section-head">
+        <h2>Rainfall-to-peak lead time</h2>
+        <span class="chart-sub">Two recorded flood seasons, rainfall trigger vs. discharge response</span>
+      </div>
+      <div class="case-grid" id="caseGrid"></div>
     </div>
-    <table class="events" id="eventsTable"><thead>
-      <tr><th>Peak date</th><th>Level</th><th>Peak discharge</th><th>Duration</th></tr>
-    </thead><tbody></tbody></table>
-  </div>
 
-  <!-- case studies -->
-  <div class="case-section">
-    <div class="section-head">
-      <h2>Rainfall-to-peak lead time</h2>
-      <span class="chart-sub">Two recorded flood seasons, rainfall trigger vs. discharge response</span>
+    <!-- methodology -->
+    <div class="method-section">
+      <div class="section-head">
+        <h2>How this was built</h2>
+        <span class="chart-sub">From raw record to live alert, step by step</span>
+      </div>
+      <p class="method-intro">The system has two parts that share one set of thresholds: a statistical
+      baseline built once from 36 years of historical daily discharge, and a live forecast feed checked
+      against that same historical record and classified against the same thresholds. The six steps below
+      cover both.</p>
+      <div class="step-list">
+
+        <div class="card step-card">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h3>The data</h3>
+            <p>36 years (1990&ndash;2025) of daily discharge at the Barnawa catchment outlet, sourced from
+            GEOGloWS &mdash; a global, physically-based hydrological reanalysis that simulates historical
+            streamflow for river reaches worldwide, including ungauged ones like this catchment. This is
+            the same record used throughout the rest of this site.</p>
+          </div>
+        </div>
+
+        <div class="card step-card">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h3>Fitting a distribution to the annual floods</h3>
+            <p>The single highest daily discharge in each of the 36 years was extracted, ranked, and fit to
+            a Generalised Extreme Value (GEV) distribution using the method of L-moments &mdash; linear
+            combinations of the ranked values that are more stable than ordinary moments on a 36-point
+            sample, and the standard approach in hydrological frequency analysis. GEV is the general family;
+            its shape parameter <span class="mono">k</span> decides whether the tail is heavy
+            (<span class="mono">k&lt;0</span>), bounded (<span class="mono">k&gt;0</span>), or exactly Gumbel
+            (<span class="mono">k=0</span>).</p>
+            <div class="param-row">
+              <span class="param-chip">k = <b id="paramK">-</b></span>
+              <span class="param-chip">&alpha; = <b id="paramAlpha">-</b></span>
+              <span class="param-chip">&xi; = <b id="paramXi">-</b></span>
+              <span class="param-chip">R&sup2; = <b id="paramR2">-</b></span>
+            </div>
+            <p>k came out at essentially zero, meaning this catchment's floods are well described by the
+            simpler Gumbel (EV-I) distribution &mdash; a result of the fit, not an assumption made to
+            simplify it.</p>
+          </div>
+        </div>
+
+        <div class="card step-card">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h3>Turning the fit into alert thresholds</h3>
+            <p>The fitted distribution gives a discharge for any return period T (the "1-in-T-year event"):
+            <span class="formula">Q(T) = &xi; + (&alpha;/k)&middot;[1&minus;(&minus;ln(1&minus;1/T))<sup>k</sup>]</span>.
+            Three return periods were chosen as the reporting thresholds &mdash; 5-year (Watch), 25-year
+            (Warning), and 100-year (Emergency) &mdash; matching common civil-engineering convention for
+            notable, serious, and design-flood-level events respectively. A 2-year discharge is also shown
+            on the charts as an informal "Advisory" band, but it sits below the reporting threshold and is
+            not a fourth alert level.</p>
+          </div>
+        </div>
+
+        <div class="card step-card">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <h3>Finding historical flood episodes</h3>
+            <p>The full 36-year daily record was scanned day by day. Any run of days at or above the Watch
+            threshold &mdash; allowing a single dry day in between without breaking the run &mdash; is
+            grouped into one "episode," recording its peak date, peak discharge, duration, and highest level
+            reached. This recovers the flood episodes on record, including a genuine one-day spike in 2008
+            just above the Watch threshold.</p>
+          </div>
+        </div>
+
+        <div class="card step-card">
+          <div class="step-num">05</div>
+          <div class="step-body">
+            <h3>Does rainfall give useful warning ahead of the river?</h3>
+            <p>For the 2012 and 2022 flood seasons (the years with hourly rainfall data available), a
+            rolling 24-hour rainfall total was computed and the most recent point before the discharge peak
+            where it crossed 20&nbsp;mm &mdash; a standard heavy-rainfall threshold &mdash; was found by
+            searching backward from the peak. The gap between that rainfall trigger and the discharge peak
+            is the case studies' "lead time," roughly 19&ndash;32 hours in these two events. That real lead
+            time is why the live system watches rainfall as well as river flow.</p>
+          </div>
+        </div>
+
+        <div class="card step-card">
+          <div class="step-num">06</div>
+          <div class="step-body">
+            <h3>Verifying and classifying the live forecast</h3>
+            <p>The live discharge forecast comes from GEOGloWS reach 140653280, at the catchment's documented
+            outlet. Before trusting it, its retrospective daily series was joined against this study's own
+            streamflow record: 13,149 overlapping days, zero discrepancy &mdash; confirming it is the same
+            reach the historical record itself comes from, not a nearby stand-in. Because of that, the live
+            forecast's daily median is classified directly against the Watch/Warning/Emergency thresholds
+            from step 3. The 25th&ndash;75th percentile spread is still shown for context, but only the
+            median drives the classification, to avoid over-warning on the upper band.</p>
+          </div>
+        </div>
+
+      </div>
     </div>
-    <div class="case-grid" id="caseGrid"></div>
-  </div>
 
-  <footer class="notes">
-    <span><b>Threshold method.</b> Annual maximum daily discharge for each of the 36 years (1990&ndash;2025) was ranked and fit to a Generalised Extreme Value (GEV) distribution using the method of L-moments. Watch/Warning/Emergency map to the 5/25/100-year return-period discharges from that fit; a display-only Advisory band at the 2-year discharge is also shown on the charts, but it sits below the reporting threshold and is not a fourth alert level &mdash; it does not gate classification or episode detection.</span>
-    <span><b>Gumbel family confirmed.</b> The fitted GEV shape parameter k &asymp; &minus;0.019 is close to zero, meaning the record is well described by the Gumbel (EV-I) distribution &mdash; the special case of GEV where k = 0. This is a result of the fit, not an assumption made to simplify it.</span>
-    <span><b>Rainfall trigger.</b> For the 2012 and 2022 case studies, the trigger time is the most recent point before the discharge peak at which trailing 24-hour rainfall reached 20&nbsp;mm, a standard heavy-rainfall threshold, used here as a stand-in for a forecast/nowcast rainfall alert.</span>
-    <span><b>Scope.</b> Episode detection merges exceedance days separated by a single dry day into one continuous episode. The live GEOGloWS discharge forecast (reach 140653280) was verified against this study's own streamflow record &mdash; 13,149 overlapping days, zero discrepancy &mdash; confirming it is the same reach, not a nearby proxy, so its median forecast is classified against the thresholds above.</span>
-  </footer>
+    <footer class="notes">
+      <span><b>Rainfall trigger.</b> For the 2012 and 2022 case studies, the trigger time is the most recent point before the discharge peak at which trailing 24-hour rainfall reached 20&nbsp;mm, used here as a stand-in for a forecast/nowcast rainfall alert.</span>
+      <span><b>Scope.</b> Episode detection merges exceedance days separated by a single dry day into one continuous episode. Data refreshes automatically every 30 minutes; see the Live conditions tab for the current fetch time.</span>
+    </footer>
 
-</div>
+  </section>
 
 <script id="ews-data" type="application/json">__EWS_DATA_JSON__</script>
 <script id="live-data" type="application/json">__LIVE_DATA_JSON__</script>
@@ -592,11 +822,15 @@
   });
 
   // ---------------- header meta ----------------
-  document.getElementById('recordSpan').textContent = 'Historical replay · ' + DATA.meta.record_period;
+  document.getElementById('recordSpan').textContent = DATA.meta.record_period;
   document.getElementById('rsqTag').textContent = DATA.gev_fit.r_squared.toFixed(3);
   document.getElementById('kTag').textContent = DATA.gev_fit.k.toFixed(4);
   document.getElementById('gevCaption').textContent = 'Shape parameter k ≈ ' + DATA.gev_fit.k.toFixed(4) +
     ' is close to zero — the record is well described by the Gumbel (EV-I) family, the k=0 special case of GEV.';
+  document.getElementById('paramK').textContent = DATA.gev_fit.k.toFixed(5);
+  document.getElementById('paramAlpha').textContent = fmtNum(DATA.gev_fit.alpha,2);
+  document.getElementById('paramXi').textContent = fmtNum(DATA.gev_fit.xi,2);
+  document.getElementById('paramR2').textContent = DATA.gev_fit.r_squared.toFixed(4);
 
   var episodesAll = DATA.episodes.slice();
   document.getElementById('episodeCount').textContent = episodesAll.length;
@@ -1060,6 +1294,67 @@
     return hrs + ' hr' + (hrs===1?'':'s') + ' ago';
   }
 
+  // ---------------- hero panel (plain-language live status, landing view) ----------------
+  var HERO_EXPLAIN = {
+    normal: "River flow is within its normal range for this catchment. There is no unusual flood risk right now.",
+    watch: "River flow is elevated above its normal range. Flooding is possible in low-lying areas.",
+    warning: "River flow has crossed the level historically associated with flooding in low-lying and flood-prone areas.",
+    emergency: "River flow has crossed the level historically associated with major flooding across the catchment."
+  };
+  var HERO_ACTION_NORMAL = "No action needed right now. This page checks conditions automatically every 30 minutes — check back after heavy rain.";
+
+  function buildHeroPanel(){
+    var banner = document.getElementById('heroBanner');
+    var levelText = document.getElementById('heroLevelText');
+    var explain = document.getElementById('heroExplain');
+    var action = document.getElementById('heroAction');
+    var forecastEl = document.getElementById('heroForecast');
+    var flowEl = document.getElementById('readoutFlow');
+    var rainEl = document.getElementById('readoutRain');
+    var outlookEl = document.getElementById('readoutOutlook');
+
+    if(!LIVE || !LIVE.fetched_at || (!LIVE.geoglows && !LIVE.rainfall)){
+      banner.dataset.level = 'normal';
+      levelText.textContent = 'Live data unavailable';
+      explain.textContent = 'The live feed could not be reached on the last check. Conditions cannot be classified right now — the 36-year historical record is still available below.';
+      action.textContent = '';
+      forecastEl.style.display = 'none';
+      return;
+    }
+
+    var g = LIVE.geoglows, r = LIVE.rainfall;
+    var curLvl = (g && g.current_level) || 'normal';
+    var maxLvl = (g && g.max_level) || curLvl;
+
+    banner.dataset.level = curLvl;
+    levelText.textContent = LEVEL_LABEL[curLvl].toUpperCase();
+    explain.textContent = HERO_EXPLAIN[curLvl];
+    action.textContent = curLvl === 'normal' ? HERO_ACTION_NORMAL : DATA.thresholds[curLvl].action;
+
+    if(g && g.forecast.length){ flowEl.innerHTML = fmtNum(g.forecast[0].med,0) + '<small>m³/s</small>'; }
+    if(r){ rainEl.innerHTML = r.rolling_24h_mm.toFixed(1) + '<small>mm</small>'; }
+    if(g){
+      outlookEl.textContent = LEVEL_LABEL[maxLvl];
+      outlookEl.style.color = maxLvl === 'normal' ? '' : levelColor(maxLvl);
+    }
+
+    var parts = [];
+    if(g){
+      parts.push(maxLvl !== curLvl
+        ? 'The forecast shows conditions may rise to <b>' + LEVEL_LABEL[maxLvl] + '</b> level in the coming days.'
+        : 'The forecast shows conditions are expected to stay at the current level in the coming days.');
+    }
+    if(r && r.trigger_time){
+      parts.push(r.trigger_is_forecast
+        ? 'Heavy rainfall (&ge;20mm in 24 hours) is forecast around <b>' + r.trigger_time.replace('T',' ') + '</b> &mdash; in the two recorded flood events on this site, river flow responded to that kind of rainfall within roughly 19&ndash;32 hours.'
+        : 'Heavy rainfall reached the 24-hour trigger level at <b>' + r.trigger_time.replace('T',' ') + '</b>.');
+    } else if(r){
+      parts.push('No heavy-rainfall trigger (&ge;20mm/24h) detected in the past 48 hours or the 7-day forecast.');
+    }
+    if(parts.length){ forecastEl.style.display = ''; forecastEl.innerHTML = parts.join(' '); }
+    else { forecastEl.style.display = 'none'; }
+  }
+
   function buildLivePanel(){
     var body = document.getElementById('liveBody');
     var dot = document.getElementById('liveDot');
@@ -1256,6 +1551,17 @@
   }
 
   buildLivePanel();
+  buildHeroPanel();
+
+  // ---------------- live detail toggle ----------------
+  var detailBtn = document.getElementById('detailToggleBtn');
+  var liveBodyEl = document.getElementById('liveBody');
+  detailBtn.addEventListener('click', function(){
+    var showing = liveBodyEl.style.display !== 'none';
+    liveBodyEl.style.display = showing ? 'none' : '';
+    detailBtn.innerHTML = showing ? '&#9662; Show live data detail (charts)' : '&#9652; Hide live data detail (charts)';
+    requestAnimationFrame(redrawAll);
+  });
 
   function redrawAll(){
     drawHydro();
@@ -1264,12 +1570,25 @@
     drawLiveCharts();
   }
 
+  // ---------------- view switching (live landing <-> historical/methodology) ----------------
+  function showView(name){
+    document.getElementById('view-live').classList.toggle('active', name === 'live');
+    document.getElementById('view-history').classList.toggle('active', name === 'history');
+    document.querySelectorAll('.view-tab').forEach(function(btn){ btn.classList.toggle('active', btn.dataset.view === name); });
+    if(location.hash.slice(1) !== name){ history.replaceState(null, '', '#' + name); }
+    requestAnimationFrame(redrawAll);
+    window.scrollTo(0, 0);
+  }
+  document.querySelectorAll('[data-view]').forEach(function(el){
+    el.addEventListener('click', function(){ showView(this.dataset.view); });
+  });
+
   window.addEventListener('resize', function(){
     clearTimeout(window._ewsResizeT);
     window._ewsResizeT = setTimeout(redrawAll, 120);
   });
 
   setDateIndex(dateToIndex['2004-08-30'] !== undefined ? dateToIndex['2004-08-30'] : series.length-1);
-  redrawAll();
+  showView(location.hash === '#history' ? 'history' : 'live');
 })();
 </script>
