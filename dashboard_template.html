@@ -1529,14 +1529,14 @@
         ctx.beginPath(); ctx.moveTo(nowX,pad.t); ctx.lineTo(nowX,pad.t+plotH); ctx.stroke();
         ctx.globalAlpha=1;
 
-        canvas._live = {xScale:xScale, all:all, obsLen:obs.length};
+        canvas._live = {xScale:xScale, all:all, obsLen:obs.length, plotW:plotW};
         if(tooltip && !canvas._liveBound){
           canvas._liveBound = true;
           canvas.addEventListener('mousemove', function(e){
             var rect = canvas.getBoundingClientRect();
             var mx = e.clientX-rect.left;
             var st = canvas._live; if(!st) return;
-            var idx = Math.round((mx-pad.l)/plotW*(st.all.length-1));
+            var idx = Math.round((mx-pad.l)/st.plotW*(st.all.length-1));
             idx = Math.max(0, Math.min(st.all.length-1, idx));
             var d = st.all[idx];
             tooltip.style.opacity=1; tooltip.style.left=mx+'px'; tooltip.style.top='6px';
@@ -1588,14 +1588,14 @@
         rows.forEach(function(d,i){ var x=gx(i), y=gy(d.med); if(i===0) gctx.moveTo(x,y); else gctx.lineTo(x,y); });
         gctx.stroke();
 
-        gcanvas._live = {gx:gx, rows:rows};
+        gcanvas._live = {gx:gx, rows:rows, gplotW:gplotW};
         if(gtooltip && !gcanvas._liveBound){
           gcanvas._liveBound = true;
           gcanvas.addEventListener('mousemove', function(e){
             var rect = gcanvas.getBoundingClientRect();
             var mx = e.clientX-rect.left;
             var st = gcanvas._live; if(!st) return;
-            var idx = Math.round((mx-pad.l)/gplotW*(st.rows.length-1));
+            var idx = Math.round((mx-pad.l)/st.gplotW*(st.rows.length-1));
             idx = Math.max(0, Math.min(st.rows.length-1, idx));
             var d = st.rows[idx];
             gtooltip.style.opacity=1; gtooltip.style.left=mx+'px'; gtooltip.style.top='6px';
