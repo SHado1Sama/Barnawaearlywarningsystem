@@ -29,6 +29,8 @@ silently or throw.
 """
 import json
 import math
+import time
+import urllib.error
 import urllib.request
 from datetime import datetime, timezone
 
@@ -57,10 +59,24 @@ def classify_discharge(q, thresholds):
     return "normal"
 
 
+RETRY_DELAYS_S = (3, 8, 15)  # GEOGloWS occasionally 400s on the CI runner's IP for no
+                              # reproducible reason (works fine locally); a short retry
+                              # clears most of these rather than dropping the whole
+                              # discharge forecast for a full 30-minute cycle.
+
+
 def fetch_json(url):
-    req = urllib.request.Request(url, headers={"User-Agent": "barnawa-ews/1.0"})
-    with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
-        return json.loads(r.read().decode())
+    last_err = None
+    for attempt, delay in enumerate((0,) + RETRY_DELAYS_S):
+        if delay:
+            time.sleep(delay)
+        req = urllib.request.Request(url, headers={"User-Agent": "barnawa-ews/1.0"})
+        try:
+            with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
+                return json.loads(r.read().decode())
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as e:
+            last_err = e
+    raise last_err
 
 
 def fetch_rainfall():

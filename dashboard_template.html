@@ -430,6 +430,7 @@
     border-radius:14px; padding:26px 28px; margin-bottom:18px;
     background:var(--status-normal-soft); border:1px solid var(--line);
   }
+  .hero-banner[data-level="unavailable"]{background:var(--surface-sunken); border-style:dashed;}
   .hero-banner[data-level="watch"]{background:var(--status-watch-soft);}
   .hero-banner[data-level="warning"]{background:var(--status-warning-soft);}
   .hero-banner[data-level="emergency"]{background:var(--status-emergency-soft);}
@@ -1356,27 +1357,50 @@
     }
 
     var g = LIVE.geoglows, r = LIVE.rainfall;
-    var curLvl = (g && g.current_level) || 'normal';
-    var maxLvl = (g && g.max_level) || curLvl;
+
+    // g missing (discharge forecast unreachable this fetch) is NOT the same as "normal" -
+    // defaulting to normal here would tell people conditions are fine when we simply don't
+    // know, which is exactly backwards for a warning system.
+    if(!g || !g.forecast.length){
+      banner.dataset.level = 'unavailable';
+      levelText.textContent = 'DISCHARGE STATUS UNAVAILABLE';
+      explain.textContent = 'The river-discharge forecast could not be reached on the last check' +
+        (LIVE.error ? ' (' + LIVE.error + ')' : '') + '. This does not mean conditions are normal - it means ' +
+        'this update has no discharge reading to classify. Rainfall data below is still current if available.';
+      action.textContent = 'Treat with caution until the next successful update, especially after heavy rain.';
+      flowEl.innerHTML = 'N/A';
+      outlookEl.textContent = 'N/A';
+      outlookEl.style.color = '';
+      if(r){ rainEl.innerHTML = r.rolling_24h_mm.toFixed(1) + '<small>mm</small>'; }
+
+      var fallbackParts = [];
+      if(r && r.trigger_time){
+        fallbackParts.push(r.trigger_is_forecast
+          ? 'Heavy rainfall (&ge;20mm in 24 hours) is forecast around <b>' + r.trigger_time.replace('T',' ') + '</b> &mdash; in the two recorded flood events on this site, river flow responded to that kind of rainfall within roughly 19&ndash;32 hours.'
+          : 'Heavy rainfall reached the 24-hour trigger level at <b>' + r.trigger_time.replace('T',' ') + '</b>.');
+      }
+      if(fallbackParts.length){ forecastEl.style.display = ''; forecastEl.innerHTML = fallbackParts.join(' '); }
+      else { forecastEl.style.display = 'none'; }
+      return;
+    }
+
+    var curLvl = g.current_level;
+    var maxLvl = g.max_level || curLvl;
 
     banner.dataset.level = curLvl;
     levelText.textContent = LEVEL_LABEL[curLvl].toUpperCase();
     explain.textContent = HERO_EXPLAIN[curLvl];
     action.textContent = curLvl === 'normal' ? HERO_ACTION_NORMAL : DATA.thresholds[curLvl].action;
 
-    if(g && g.forecast.length){ flowEl.innerHTML = fmtNum(g.forecast[0].med,0) + '<small>m³/s</small>'; }
+    flowEl.innerHTML = fmtNum(g.forecast[0].med,0) + '<small>m³/s</small>';
     if(r){ rainEl.innerHTML = r.rolling_24h_mm.toFixed(1) + '<small>mm</small>'; }
-    if(g){
-      outlookEl.textContent = LEVEL_LABEL[maxLvl];
-      outlookEl.style.color = maxLvl === 'normal' ? '' : levelColor(maxLvl);
-    }
+    outlookEl.textContent = LEVEL_LABEL[maxLvl];
+    outlookEl.style.color = maxLvl === 'normal' ? '' : levelColor(maxLvl);
 
     var parts = [];
-    if(g){
-      parts.push(maxLvl !== curLvl
-        ? 'The forecast shows conditions may rise to <b>' + LEVEL_LABEL[maxLvl] + '</b> level in the coming days.'
-        : 'The forecast shows conditions are expected to stay at the current level in the coming days.');
-    }
+    parts.push(maxLvl !== curLvl
+      ? 'The forecast shows conditions may rise to <b>' + LEVEL_LABEL[maxLvl] + '</b> level in the coming days.'
+      : 'The forecast shows conditions are expected to stay at the current level in the coming days.');
     if(r && r.trigger_time){
       parts.push(r.trigger_is_forecast
         ? 'Heavy rainfall (&ge;20mm in 24 hours) is forecast around <b>' + r.trigger_time.replace('T',' ') + '</b> &mdash; in the two recorded flood events on this site, river flow responded to that kind of rainfall within roughly 19&ndash;32 hours.'
