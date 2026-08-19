@@ -50,6 +50,20 @@ jobs:
       - name: Fetch live conditions
         run: python live_fetch.py
 
+      # history.json is how "days prior" data survives between runs: the runner
+      # itself is thrown away after every job, so a commit is the only durable
+      # store available to a backend-less static site.
+      - name: Commit updated history
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add history.json
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: record live snapshot"
+            git pull --rebase --autostash
+            git push
+          fi
+
       - name: Build site
         run: python build_site.py
 

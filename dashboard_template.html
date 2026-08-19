@@ -405,6 +405,15 @@
     font-family:'IBM Plex Mono',monospace; font-size:12px;
     background:var(--surface-sunken); padding:2px 6px; border-radius:4px;
   }
+  .hist-range{display:flex; gap:6px;}
+  .hist-range button.ctrl{padding:5px 10px; font-size:11px;}
+  .hist-log{margin-top:12px;}
+  .hist-log-title{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.05em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:6px;}
+  .hist-log-row{display:flex; align-items:center; gap:8px; padding:5px 0; border-top:1px solid var(--line); font-size:12.5px;}
+  .hist-log-row:first-child{border-top:none;}
+  .hist-log-dot{width:7px; height:7px; border-radius:50%; flex:none;}
+  .hist-log-time{color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; font-size:11.5px;}
+  .hist-log-level{font-weight:700; margin-left:auto;}
 
   /* ---- view switching ---- */
   .view-tabs{display:flex; gap:4px; background:var(--surface-raised); border:1px solid var(--line-strong); border-radius:100px; padding:3px;}
@@ -827,6 +836,7 @@
 
 <script id="ews-data" type="application/json">__EWS_DATA_JSON__</script>
 <script id="live-data" type="application/json">__LIVE_DATA_JSON__</script>
+<script id="history-data" type="application/json">__HISTORY_DATA_JSON__</script>
 <script>
 (function(){
   "use strict";
@@ -1317,6 +1327,15 @@
     catch(e){ return null; }
   })();
 
+  // compact snapshots recorded every ~30 minutes by live_fetch.py, oldest first
+  var HIST = (function(){
+    try {
+      var v = JSON.parse(document.getElementById('history-data').textContent);
+      return Array.isArray(v) ? v : [];
+    } catch(e){ return []; }
+  })();
+  var HIST_RANGE_DAYS = 7;
+
   var STALE_MINUTES = 90;
 
   function fmtAgo(iso){
@@ -1487,8 +1506,165 @@
     }
     grid.appendChild(gc);
 
+    // ---- recent history card (spans both columns) ----
+    var hc = document.createElement('div');
+    hc.className = 'card live-card';
+    hc.style.gridColumn = '1 / -1';
+    hc.innerHTML =
+      '<div class="live-card-head"><span class="live-card-title">Recent history</span>'+
+      '<span class="hist-range" id="histRange">'+
+        '<button class="ctrl" data-days="7" type="button">7d</button>'+
+        '<button class="ctrl" data-days="30" type="button">30d</button>'+
+        '<button class="ctrl" data-days="90" type="button">90d</button>'+
+        '<button class="ctrl" data-days="9999" type="button">All</button>'+
+      '</span></div>'+
+      '<div class="chart-wrap"><canvas id="histChart" height="130"></canvas><div class="tooltip" id="histTooltip"></div></div>'+
+      '<div class="legend-row" style="margin-top:8px; padding-top:8px;">'+
+        '<span class="legend-item"><span class="legend-swatch" style="background:'+cssVar('--rain')+'"></span>Rainfall, 24h rolling (mm)</span>'+
+        '<span class="legend-item"><span class="legend-swatch" style="background:'+cssVar('--accent')+'"></span>Discharge (m&sup3;/s), coloured by level</span>'+
+      '</div>'+
+      '<div class="hist-log" id="histLog"></div>';
+    grid.appendChild(hc);
+
     body.innerHTML = '';
     body.appendChild(grid);
+
+    wireHistoryRange();
+    renderHistory(HIST_RANGE_DAYS);
+  }
+
+  // ---------------- recent history (recorded snapshots) ----------------
+  function wireHistoryRange(){
+    var btns = document.querySelectorAll('#histRange button');
+    btns.forEach(function(b){
+      b.classList.toggle('primary', Number(b.dataset.days) === HIST_RANGE_DAYS);
+      b.addEventListener('click', function(){
+        btns.forEach(function(x){ x.classList.remove('primary'); });
+        b.classList.add('primary');
+        renderHistory(Number(b.dataset.days));
+      });
+    });
+  }
+
+  function renderHistory(days){
+    HIST_RANGE_DAYS = days;
+    var log = document.getElementById('histLog');
+    if(!log) return;
+    if(!HIST.length){
+      log.innerHTML = '<div class="proxy-note">No history recorded yet &mdash; snapshots accumulate every 30 minutes from now on, so this fills in over the next few days.</div>';
+      drawHistoryChart([]);
+      return;
+    }
+    var cutoff = Date.now() - days*24*3600*1000;
+    var recs = HIST.filter(function(r){ return new Date(r.t).getTime() >= cutoff; });
+    drawHistoryChart(recs);
+    renderHistoryLog(recs);
+  }
+
+  function renderHistoryLog(recs){
+    var log = document.getElementById('histLog');
+    var transitions = [];
+    var prevLvl = null;
+    recs.forEach(function(r){
+      if(r.level && r.level !== prevLvl){ transitions.push({t:r.t, level:r.level}); prevLvl = r.level; }
+    });
+    if(!recs.length){
+      log.innerHTML = '<div class="proxy-note">No snapshots recorded in this window yet.</div>';
+      return;
+    }
+    if(!transitions.length){
+      var lastLvl = null;
+      for(var i=recs.length-1;i>=0;i--){ if(recs[i].level){ lastLvl = recs[i].level; break; } }
+      log.innerHTML = '<div class="proxy-note">No level changes in this window &mdash; steady at <b>'+(lastLvl?LEVEL_LABEL[lastLvl]:'unknown')+'</b>.</div>';
+      return;
+    }
+    transitions.reverse();
+    log.innerHTML = '<div class="hist-log-title">Level changes in this window</div>' +
+      transitions.slice(0,20).map(function(tr){
+        var d = new Date(tr.t);
+        var color = tr.level === 'normal' ? cssVar('--status-normal') : levelColor(tr.level);
+        return '<div class="hist-log-row"><span class="hist-log-dot" style="background:'+color+'"></span>'+
+          '<span class="hist-log-time">'+d.toLocaleString()+'</span>'+
+          '<span class="hist-log-level" style="color:'+color+'">'+LEVEL_LABEL[tr.level]+'</span></div>';
+      }).join('');
+  }
+
+  function drawHistoryChart(recs){
+    var canvas = document.getElementById('histChart');
+    var tooltip = document.getElementById('histTooltip');
+    if(!canvas) return;
+    var setup = setupCanvas(canvas);
+    var ctx = setup.ctx, W = setup.w, H = setup.h;
+    ctx.clearRect(0,0,W,H);
+    var pad = {l:44, r:44, t:6, b:16};
+
+    if(recs.length < 2){
+      ctx.fillStyle = cssVar('--ink-faint');
+      ctx.font = '11.5px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('Not enough history yet for this window.', W/2, H/2);
+      return;
+    }
+
+    var plotW = W-pad.l-pad.r, plotH = H-pad.t-pad.b;
+    var maxRain = Math.max.apply(null, recs.map(function(r){ return r.rain24||0; })) || 1;
+    var maxFlow = Math.max.apply(null, recs.map(function(r){ return r.flow||0; })) || 1;
+    var xScale = function(i){ return pad.l + (i/(recs.length-1))*plotW; };
+    var yFlow = function(q){ return pad.t + plotH - (q/maxFlow)*plotH; };
+    var barW = plotW/recs.length;
+
+    ctx.font = '9.5px "IBM Plex Mono", monospace';
+    ctx.fillStyle = cssVar('--rain');
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillText(fmtNum(maxRain,0)+'mm', 2, pad.t);
+    ctx.fillStyle = cssVar('--accent');
+    ctx.textAlign = 'right';
+    ctx.fillText(fmtNum(maxFlow,0)+'m³/s', W-2, pad.t);
+
+    recs.forEach(function(r,i){
+      if(r.rain24 == null) return;
+      var h = (r.rain24/maxRain)*plotH;
+      ctx.fillStyle = cssVar('--rain'); ctx.globalAlpha = 0.55;
+      ctx.fillRect(xScale(i)-barW/2, pad.t+plotH-h, Math.max(barW-0.6,0.6), h);
+    });
+    ctx.globalAlpha = 1;
+
+    var prevPt = null;
+    recs.forEach(function(r,i){
+      if(r.flow == null){ prevPt = null; return; }
+      var x = xScale(i), y = yFlow(r.flow);
+      if(prevPt){
+        ctx.strokeStyle = r.level === 'normal' ? cssVar('--status-normal') : levelColor(r.level || 'normal');
+        ctx.lineWidth = 1.8; ctx.beginPath(); ctx.moveTo(prevPt.x,prevPt.y); ctx.lineTo(x,y); ctx.stroke();
+      }
+      prevPt = {x:x, y:y};
+    });
+
+    var labelEvery = Math.max(1, Math.round(recs.length/6));
+    ctx.fillStyle = cssVar('--ink-faint'); ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    recs.forEach(function(r,i){
+      if(i % labelEvery !== 0) return;
+      var d = new Date(r.t);
+      ctx.fillText((d.getMonth()+1)+'/'+d.getDate(), xScale(i), pad.t+plotH+2);
+    });
+
+    canvas._hist = {xScale:xScale, recs:recs, plotW:plotW};
+    if(tooltip && !canvas._histBound){
+      canvas._histBound = true;
+      canvas.addEventListener('mousemove', function(e){
+        var rect = canvas.getBoundingClientRect();
+        var mx = e.clientX-rect.left;
+        var st = canvas._hist; if(!st) return;
+        var idx = Math.round((mx-pad.l)/st.plotW*(st.recs.length-1));
+        idx = Math.max(0, Math.min(st.recs.length-1, idx));
+        var d = st.recs[idx];
+        tooltip.style.opacity = 1; tooltip.style.left = mx+'px'; tooltip.style.top = '6px';
+        tooltip.innerHTML = new Date(d.t).toLocaleString() + '<br>' +
+          (d.rain24 != null ? d.rain24.toFixed(1)+'mm/24h' : 'rain n/a') + '<br>' +
+          (d.flow != null ? d.flow.toFixed(1)+'m³/s &middot; '+LEVEL_LABEL[d.level || 'normal'] : 'flow n/a');
+      });
+      canvas.addEventListener('mouseleave', function(){ tooltip.style.opacity = 0; });
+    }
   }
 
   function drawLiveCharts(){
@@ -1626,6 +1802,7 @@
     drawFreq();
     drawCaseCharts();
     drawLiveCharts();
+    if(document.getElementById('histChart')) renderHistory(HIST_RANGE_DAYS);
   }
 
   // ---------------- view switching (live landing <-> historical/methodology) ----------------

@@ -40,6 +40,8 @@ GEOGLOWS_DIST_KM = 5.5
 RAIN_TRIGGER_MM_24H = 20.0
 OUT_PATH = "live_data.json"
 EWS_DATA_PATH = "ews_data.json"
+HISTORY_PATH = "history.json"
+MAX_HISTORY_RECORDS = 1825  # ~5 years at one snapshot/day
 TIMEOUT = 20
 LEVEL_ORDER = ["normal", "watch", "warning", "emergency"]
 
@@ -168,6 +170,39 @@ def fetch_geoglows():
     }
 
 
+def append_history(out):
+    """Append one snapshot per UTC calendar day to history.json, so the dashboard
+    can show recent days without a git commit on every 30-minute fetch: once
+    today's date is already recorded, later fetches the same day are a no-op
+    (first successful fetch of the day wins). Skipped entirely when both
+    sources failed, so a fully-dead fetch doesn't pollute the record with an
+    all-null row."""
+    r, g = out.get("rainfall"), out.get("geoglows")
+    if not r and not g:
+        return
+    day = out["fetched_at"][:10]
+    try:
+        with open(HISTORY_PATH) as f:
+            hist = json.load(f)
+        if not isinstance(hist, list):
+            hist = []
+    except (FileNotFoundError, json.JSONDecodeError):
+        hist = []
+    if hist and hist[-1].get("date") == day:
+        return
+    hist.append({
+        "date": day,
+        "t": out["fetched_at"],
+        "rain24": r["rolling_24h_mm"] if r else None,
+        "flow": g["forecast"][0]["med"] if g and g["forecast"] else None,
+        "level": g["current_level"] if g else None,
+    })
+    if len(hist) > MAX_HISTORY_RECORDS:
+        hist = hist[-MAX_HISTORY_RECORDS:]
+    with open(HISTORY_PATH, "w") as f:
+        json.dump(hist, f)
+
+
 def main():
     fetched_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     out = {"fetched_at": fetched_at, "status": "ok", "error": None}
@@ -187,6 +222,7 @@ def main():
 
     with open(OUT_PATH, "w") as f:
         json.dump(out, f)
+    append_history(out)
     print(fetched_at, out["status"], out["error"] or "")
 
 

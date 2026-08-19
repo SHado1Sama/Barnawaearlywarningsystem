@@ -21,6 +21,7 @@ def b64_of(path):
 template = open("dashboard_template.html", encoding="utf-8").read()
 data_json = open("ews_data.json", encoding="utf-8").read()
 live_json = open("live_data.json", encoding="utf-8").read() if os.path.exists("live_data.json") else "null"
+history_json = open("history.json", encoding="utf-8").read() if os.path.exists("history.json") else "[]"
 
 replacements = {
     "__ARCHIVO_B64__": b64_of("fonts/archivo.woff2"),
@@ -31,6 +32,7 @@ replacements = {
     "__MAP_OVERVIEW_B64__": b64_of("maps/overview.png"),
     "__EWS_DATA_JSON__": data_json,
     "__LIVE_DATA_JSON__": live_json,
+    "__HISTORY_DATA_JSON__": history_json,
 }
 
 out = template
