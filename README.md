@@ -80,7 +80,9 @@ The dashboard runs two rainfall-driven forecasts side by side:
 - **Primary (forecast.py)** decides the headline level together with the river
   reading. Per-day SCS curve number with the AMC soil classes and the
   wet-season floor above. On the full 36-year replay (rainfall file
-  rain_windows.csv, box-averaged ERA5, scored against the observed record):
+  rain_era5_redownload_1990_2025.csv, box-averaged ERA5, scored against
+  the observed record; that file is a re-download fetched in Nov 2026,
+  not the original rainfall file used in the defended project report):
   12 alert days, 2 false alarm days (both trailing a real flood), and 2 of
   the 6 flood episodes caught (2004 and 2012). It is conservative and
   rarely wrong, but it misses floods that build from many moderate rain

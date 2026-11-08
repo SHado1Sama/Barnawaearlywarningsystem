@@ -1,7 +1,9 @@
 # Barnawa EWS v3 (bounded cumulative abstraction): build and test report
 
-Built and tested locally on 8 Nov 2026. NOT pushed to GitHub, awaiting the
-owner's go-ahead. The live model remains v2.
+Built and tested locally on 8 Nov 2026, then pushed to GitHub the same
+day at the owner's go-ahead: v3 is live on the dashboard as a
+supplementary experimental advisory. The primary model remains v2, and
+v3 never drives the headline level.
 
 ## What was built (folder: barnawa-cumulative-v3)
 
@@ -17,12 +19,19 @@ owner's go-ahead. The live model remains v2.
 - replay_v3.py plus daily_replay_v3.csv and replay_v3_summary.json: the
   full 36-year replay, scored with the identical definitions as the v2
   replay (alert day, verified within the 7-day horizon, episode caught if
-  an alert was issued within 7 days before the peak).
+  an alert was issued within 7 days before the peak). Scoring rule, stated
+  once here and used for every false-alarm figure in this report: a false
+  alarm day is an alert day after which no day at or above the Watch
+  discharge (1,836 m3/s) occurs within the following 7 days. The figures
+  count DAYS under that rule. Counting clusters or occasions instead
+  gives different numbers; the occasion counts printed on the dashboard
+  are defined in Addendum 4.
 
 ## The bound that was chosen, and why
 
 From a sweep of spell caps (3 to 14 days), dry breaks (1 and 2 days) and
-abstraction-store recovery rates (the full sweep is in the working notes),
+abstraction-store recovery rates (the cap by dry-gap sweep is
+reproducible with sensitivity_grid.py in this repo),
 the selected design is: spell cap 6 days, dry break 1 day, lambda 0.20.
 Six days is the storm day plus the 5 antecedent days the AMC logic already
 treats as the soil's memory, so the accumulation window is the model's own

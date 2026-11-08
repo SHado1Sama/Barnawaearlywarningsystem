@@ -6,7 +6,7 @@ import amc, forecast, cumulative
 import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-rain = pd.read_csv(os.path.join(HERE, "rain_windows.csv"), parse_dates=["Date"])
+rain = pd.read_csv(os.path.join(HERE, "rain_era5_redownload_1990_2025.csv"), parse_dates=["Date"])
 daily_mm = {d.date(): float(v) for d, v in zip(rain["Date"], rain["Precipitation_mm"])}
 ews = json.load(open(os.path.join(HERE, "ews_data.json")))
 thresholds = ews["thresholds"]
