@@ -1,5 +1,5 @@
 """
-Barnawa EWS - bounded cumulative abstraction (v3, EXPERIMENTAL, local only).
+Barnawa EWS - bounded cumulative abstraction (v3, EXPERIMENTAL, supplementary advisory only).
 
 Why: in v2 (forecast.py), every day's rain is fed to the SCS runoff equation
 as if that day were a whole storm, so the initial abstraction Ia = lambda * S
