@@ -10,9 +10,13 @@ at all in v2 while the river rose to 2,017 m3/s.
 
 What changes here, and only here: Ia is charged ONCE per wet spell against
 the spell's CUMULATIVE rainfall, and each day's runoff is the increment of
-cumulative runoff, exactly the procedure NRCS NEH Part 630 Subpart H uses
-to spread runoff through a storm ("tabulate the accumulated rainfalls,
-estimate the accumulated runoff, compute the increments of runoff"):
+cumulative runoff, the procedure NRCS sets out for runoff during a storm
+in the National Engineering Handbook, Part 630, Chapter 10, section
+630.1002(c), worked as Example 10-6 ("tabulate the accumulated rainfalls,
+estimate the accumulated runoff, compute the increments of runoff").
+Scope note: NRCS applies that procedure WITHIN a single storm. Extending
+it across the days of a wet spell, and the bounds below (6-day cap, 1-day
+dry break), are this project's own heuristics, not NRCS method:
     Pc(t) = rain accumulated since the spell began
     Qc(t) = (Pc - Ia)^2 / (Pc - Ia + S)  for Pc > Ia, else 0
     runoff(t) = Qc(t) - Qc(t-1)
@@ -31,9 +35,12 @@ The bound (what makes this v3 rather than the rejected raw version):
 Everything downstream is v2 unchanged: unit hydrograph, monthly baseflow,
 baseflow-aware triggers, classification.
 
-Honest status, from the full 36-year test (V3_TEST_REPORT.md): this catches
-4 of 6 observed flood episodes (v2: 2 of 6) but at 68 alert days with 52
-false alarm days (v2: 12 and 2). It still does NOT catch 2024. It is a
+Honest status, from the full 36-year test (V3_TEST_REPORT.md in this
+repo): at the Watch trigger it catches 4 of 6 observed flood episodes
+(v2: 2 of 6) at 68 alert days with 52 false alarm days (v2: 12 and 2);
+at the Advisory trigger, the level this card actually signals, it
+catches 5 of 6 (only 2024 missed) at 206 alert days in 31 occasions.
+It still does NOT catch 2024 at any setting tested. It is a
 detection-first experimental variant, not a replacement for v2.
 """
 import amc
@@ -113,16 +120,24 @@ from datetime import date as _date
 # scored exactly as the primary model: see V3_TEST_REPORT.md.
 REPLAY_STATS = {
     "period": "1990-2025",
-    "alert_days": 68,
-    "false_alarm_days": 52,
-    "episodes_caught": 4,
-    "episodes_total": 6,
+    # Occasions are clusters of alert days, split when the gap between
+    # alert days exceeds 2 days.
+    "watch_tier": {
+        "alert_days": 68, "false_alarm_days": 52,
+        "occasions": 14, "occasions_flood_followed": 4, "occasions_no_flood": 10,
+        "episodes_caught": 4, "episodes_total": 6, "missed": "2008 and 2024",
+    },
+    "advisory_tier": {
+        "alert_days": 206, "occasions": 31,
+        "years_with_signal": 19, "mostly_month": "August",
+        "episodes_caught": 5, "episodes_total": 6, "missed": "2024",
+        "occasions_followed_by_advisory_flow": 13,
+        "occasions_below_advisory": 18, "of_those_rose_1000_to_advisory": 10,
+        "advisory_flow_m3s": 1357.7,
+    },
     "primary_alert_days": 12,
     "primary_false_alarm_days": 2,
     "primary_episodes_caught": 2,
-    "occasions": 14,
-    "occasions_flood_followed": 4,
-    "occasions_no_flood": 10,
 }
 
 
@@ -153,8 +168,10 @@ def live_model_v3(full_series, now_str, thresholds, advisory_discharge):
     the dashboard headline level (that stays with the river reading and the
     primary forecast in forecast.live_model). It exists because in the
     36-year replay it caught 4 of 6 flood episodes against the primary
-    model's 2 of 6, but with 52 false alarm days against the primary's 2,
-    so its signals are shown as Advisory, not Watch.
+    model's 2 of 6, but with 52 false alarm days against the primary's 2
+    at the Watch trigger, so its signals are shown as Advisory, not Watch.
+    The card prints the record for the Advisory trigger it signals at,
+    with the Watch-trigger record as a secondary line.
 
     full_series / now_str / thresholds: same inputs as forecast.live_model.
     advisory_discharge: the Advisory design discharge (ews_data.json

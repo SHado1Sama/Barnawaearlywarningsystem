@@ -92,12 +92,23 @@ The dashboard runs two rainfall-driven forecasts side by side:
   detection rate; only future flood seasons can test it. It charges the initial
   abstraction (Ia = 20% of S) once per wet spell against the spell's
   cumulative rain and takes each day's runoff as the increment of
-  cumulative runoff (the procedure NEH Part 630 uses to spread runoff
-  through a storm), with spells capped at 6 days. On the same replay:
-  68 alert days, 52 false alarm days, and 4 of 6 episodes caught (1999,
-  2004, 2012, 2014; it still misses 2008 and 2024). Grouped into occasions,
-  its signal fired 14 times in 36 years: a flood followed 4 times, and 10
-  times no flood followed. The settings are not magic: across spell caps of
+  cumulative runoff (the procedure NEH Part 630, Chapter 10, section
+  630.1002(c), Example 10-6, sets out for runoff during a storm; NRCS
+  applies it within a single storm, so extending it across the days of a
+  wet spell, and the 6-day cap and 1-day dry break below, are this
+  project's own heuristics), with spells capped at 6 days. Its record
+  depends on the level it is scored at, and the dashboard prints the
+  record for the level it signals. At the Advisory trigger, the level
+  the card signals: 206 alert days in 31 occasions (about once a year,
+  a signal in 19 of 36 years, mostly in August), preceding 5 of 6
+  episodes (1999, 2004, 2008, 2012, 2014; only 2024 missed); the river
+  went on to reach the Advisory flow (1,358 m3/s) after 13 of the 31
+  occasions, and on 10 of the other 18 it still rose to between 1,000
+  and 1,358 m3/s. At the higher Watch trigger it is rarer and sharper:
+  68 alert days, 52 false alarm days, 14 occasions, 4 of 6 episodes
+  caught (it misses 2008 there as well as 2024), a flood following on
+  4 occasions and not on 10. (Occasions are clusters of alert days,
+  split when the gap between alert days exceeds 2 days.) The settings are not magic: across spell caps of
   4, 6 and 8 days and dry gaps of 1 and 2 days it catches 2, 4 and 5 of 6
   with false days rising alongside (26, 52, 100 at gap 1), so 6 days and
   1 day is a middle point on a smooth trade, and at cap 6 the 2014 catch
