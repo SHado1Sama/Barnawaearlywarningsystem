@@ -1755,6 +1755,31 @@
       grid.appendChild(mc);
     }
 
+    // ---- cumulative model card (supplementary, advisory only; never touches the headline) ----
+    if(LIVE.rainfall && LIVE.rainfall.model_v3){
+      var v3 = LIVE.rainfall.model_v3;
+      var vc = document.createElement('div');
+      vc.className = 'card live-card';
+      var vSig = v3.signal === 'none' ? 'No signal' : (v3.signal === 'advisory' ? 'Advisory' : 'Watch-level signal, advisory only');
+      var vCol = v3.signal === 'none' ? cssVar('--status-normal') : levelColor('watch');
+      var vSoft = v3.signal === 'none' ? cssVar('--status-normal-soft') : cssVar('--status-watch-soft');
+      var vPeakWhen = v3.days_to_peak === 0 ? 'peak expected today' : 'peak in about '+v3.days_to_peak+' day'+(v3.days_to_peak===1?'':'s');
+      var vv = v3.validation;
+      vc.innerHTML =
+        '<div class="live-card-head"><span class="live-card-title">Cumulative rainfall model, supplementary, experimental</span>'+
+        '<span class="trigger-pill" style="background:'+vSoft+'; color:'+vCol+';">'+vSig+'</span></div>'+
+        '<div class="rolling-readout"><span class="num">'+fmtNum(v3.predicted_peak,0)+'<span style="font-size:14px;">m&sup3;/s</span></span>'+
+        '<span class="of">predicted peak, '+vPeakWhen+' &middot; Advisory trigger this month '+fmtNum(v3.triggers.advisory,0)+' m&sup3;/s &middot; Watch trigger '+fmtNum(v3.triggers.watch,0)+' m&sup3;/s</span></div>'+
+        '<div class="proxy-note">'+(v3.signal === 'none' ? 'No build-up of rain is forming at the moment. ' : '<b>A build-up of rain is forming. Watch the river.</b> ')+
+        'This second model accumulates moderate rain across a wet spell instead of charging the soil abstraction in full every day, so it sees build-ups the primary forecast misses. '+
+        '<b>Experimental:</b> it was added after the project defence, is not part of the defended report, and was designed after studying the same '+vv.period+' record it is scored on, '+
+        'so its record below is a design check, not proof; only future flood seasons can test it. On that record its signal fired on '+vv.occasions+' occasions: a flood followed '+vv.occasions_flood_followed+
+        ' times (it preceded '+vv.episodes_caught+' of the '+vv.episodes_total+' recorded floods, missing 2008 and 2024), and '+vv.occasions_no_flood+' times no flood followed '+
+        '('+vv.alert_days+' alert days in total, '+vv.false_alarm_days+' of them not followed by a flood within a week; the primary model raised '+vv.primary_alert_days+' alert days with '+vv.primary_false_alarm_days+' false). '+
+        'For that reason it is shown as <b>advisory only</b>: it never raises the headline level on this page, which stays with the river reading and the primary forecast above.</div>';
+      grid.appendChild(vc);
+    }
+
     // ---- geoglows card ----
     var gc = document.createElement('div');
     gc.className = 'card live-card';

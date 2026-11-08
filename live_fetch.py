@@ -39,6 +39,7 @@ import urllib.request
 from datetime import datetime, timedelta, timezone
 
 import amc
+import cumulative as cum_model
 import forecast as rain_model
 
 LAT, LON = 10.4700, 7.4500
@@ -143,6 +144,16 @@ def fetch_rainfall():
         print("AMC calculation skipped:", e)
         amc_block = None
 
+    # Supplementary cumulative model (cumulative.py): bounded cumulative abstraction,
+    # advisory only, never drives the headline. Also optional and failure-isolated.
+    try:
+        with open(EWS_DATA_PATH) as f:
+            advisory_q = json.load(f)["advisory_display"]["discharge"]
+        model_v3_block = cum_model.live_model_v3(full, now_str, load_thresholds(), advisory_q)
+    except Exception as e:
+        print("Cumulative model skipped:", e)
+        model_v3_block = None
+
     # Rainfall-driven discharge forecast (forecast.py): soil wetness with the wet-season floor,
     # unit hydrograph, baseflow, month-specific triggers. Also optional: a failure only hides the card.
     try:
@@ -163,6 +174,7 @@ def fetch_rainfall():
         "forecast": forecast[:168],
         "amc": amc_block,
         "model": model_block,
+        "model_v3": model_v3_block,
     }
 
 

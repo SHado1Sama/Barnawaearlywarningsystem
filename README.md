@@ -72,6 +72,45 @@ August trigger) and that neither season has false-alarm days, but it is not a de
 rate. The rainfall-driven forecast is experimental until the full 36-year replay (the
 offline simulation with the ERA5 rainfall file) has been run with the same rules.
 
+
+## Two models: primary forecast and a supplementary cumulative model
+
+The dashboard runs two rainfall-driven forecasts side by side:
+
+- **Primary (forecast.py)** decides the headline level together with the river
+  reading. Per-day SCS curve number with the AMC soil classes and the
+  wet-season floor above. On the full 36-year replay (rainfall file
+  rain_windows.csv, box-averaged ERA5, scored against the observed record):
+  12 alert days, 2 false alarm days (both trailing a real flood), and 2 of
+  the 6 flood episodes caught (2004 and 2012). It is conservative and
+  rarely wrong, but it misses floods that build from many moderate rain
+  days, because each day is charged the full initial abstraction again.
+- **Supplementary (cumulative.py)**, advisory only, and **experimental: it is a
+  post-defence extension, not part of the defended project report.** It was
+  designed after studying why the recorded floods were missed, and then scored
+  on that same record, so its figures below are a design check, not a proven
+  detection rate; only future flood seasons can test it. It charges the initial
+  abstraction (Ia = 20% of S) once per wet spell against the spell's
+  cumulative rain and takes each day's runoff as the increment of
+  cumulative runoff (the procedure NEH Part 630 uses to spread runoff
+  through a storm), with spells capped at 6 days. On the same replay:
+  68 alert days, 52 false alarm days, and 4 of 6 episodes caught (1999,
+  2004, 2012, 2014; it still misses 2008 and 2024). Grouped into occasions,
+  its signal fired 14 times in 36 years: a flood followed 4 times, and 10
+  times no flood followed. The settings are not magic: across spell caps of
+  4, 6 and 8 days and dry gaps of 1 and 2 days it catches 2, 4 and 5 of 6
+  with false days rising alongside (26, 52, 100 at gap 1), so 6 days and
+  1 day is a middle point on a smooth trade, and at cap 6 the 2014 catch
+  depends on the 1-day gap. It catches more floods but cries wolf far too often
+  to issue warnings, so on the dashboard it can only ever show an
+  **Advisory**: it never raises the headline level. Treat its signal as a
+  prompt to watch the river, not as a warning. Neither model catches the
+  2024 episode on this rainfall; see the replay notes in the project
+  record before quoting detection rates.
+
+Checks: `python test_amc.py` for the primary model's soil and forecast
+logic, `python test_cumulative.py` for the supplementary model.
+
 ## Local development
 
 ```bash
