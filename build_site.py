@@ -9,6 +9,8 @@ import base64
 import json
 import os
 
+import forecast
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)
 
@@ -19,7 +21,13 @@ def b64_of(path):
 
 
 template = open("dashboard_template.html", encoding="utf-8").read()
-data_json = open("ews_data.json", encoding="utf-8").read()
+# Historical data, plus the forecast replay of each stored case study with and without the
+# wet-season floor (forecast.py). The replay is computed here from the stored rainfall, so the
+# numbers on the page always come from the code and nothing is typed in by hand.
+_data = json.load(open("ews_data.json", encoding="utf-8"))
+for _cs in _data["case_studies"]:
+    _cs["model_check"] = forecast.replay_case(_cs, _data["thresholds"])
+data_json = json.dumps(_data, separators=(",", ":"))
 live_json = open("live_data.json", encoding="utf-8").read() if os.path.exists("live_data.json") else "null"
 history_json = open("history.json", encoding="utf-8").read() if os.path.exists("history.json") else "[]"
 

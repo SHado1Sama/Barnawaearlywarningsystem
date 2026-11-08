@@ -7,7 +7,11 @@ EWS_System/live_data.json:
   1. Rainfall (Open-Meteo Forecast API) at the catchment centroid
      (10.634 N, 7.753 E) - past 2 days observed + 7 days forecast, hourly.
      This is the primary live signal: it feeds the same 24h/20mm trigger
-     logic used for the 2012/2022 historical case studies.
+     logic used for the 2012/2022 historical case studies. The past 7 days
+     are also read so amc.py can work out the 5-day antecedent moisture
+     condition (report Section 3.7.2) and so the rainfall-driven discharge forecast
+     (forecast.py) can run on the live rain with the July-September soil floor; the
+     24 h trigger itself is unchanged.
 
   2. Discharge (GEOGloWS v2 API) for the mapped global forecast reach at
      the catchment's documented outlet (10.4700 N, 7.4500 E, Table 3.1) -
@@ -32,9 +36,13 @@ import math
 import time
 import urllib.error
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+
+import amc
+import forecast as rain_model
 
 LAT, LON = 10.4700, 7.4500
+AMC_PAST_DAYS = 21          # hourly rain history fetched: soil wetness (5-day antecedent rain) and the tail of earlier storms
 GEOGLOWS_RIVER_ID = 140653280
 GEOGLOWS_DIST_KM = 5.5
 RAIN_TRIGGER_MM_24H = 20.0
@@ -84,7 +92,7 @@ def fetch_json(url):
 def fetch_rainfall():
     url = (
         f"https://api.open-meteo.com/v1/forecast?latitude={LAT}&longitude={LON}"
-        "&hourly=precipitation&past_days=2&forecast_days=7&timezone=UTC"
+        f"&hourly=precipitation&past_days={AMC_PAST_DAYS}&forecast_days=7&timezone=UTC"
     )
     d = fetch_json(url)
     times = d["hourly"]["time"]
@@ -92,7 +100,13 @@ def fetch_rainfall():
     now = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
     now_str = now.strftime("%Y-%m-%dT%H:%M")
 
-    series = [{"t": t, "mm": (p if p is not None else 0.0)} for t, p in zip(times, precip)]
+    # full hourly series (past AMC_PAST_DAYS days + forecast): used for the AMC calculation
+    full = [{"t": t, "mm": (p if p is not None else 0.0)} for t, p in zip(times, precip)]
+
+    # The 24 h trigger search and the chart keep their original window, which starts at
+    # 00:00 UTC two days ago, so adding the longer history above does not change them.
+    window_start = (now - timedelta(days=2)).strftime("%Y-%m-%dT00:00")
+    series = [pt for pt in full if pt["t"] >= window_start]
     observed = [pt for pt in series if pt["t"] <= now_str]
     forecast = [pt for pt in series if pt["t"] > now_str]
 
@@ -105,14 +119,37 @@ def fetch_rainfall():
     # are detected
     trigger_time = None
     trigger_is_forecast = False
+    trigger_r24 = None
     for i in range(len(series)):
         r24 = rolling24(series, i)
         if r24 >= RAIN_TRIGGER_MM_24H:
             trigger_time = series[i]["t"]
             trigger_is_forecast = series[i]["t"] > now_str
+            trigger_r24 = r24
             break
 
     obs_r24 = rolling24(observed, len(observed) - 1) if observed else 0.0
+
+    # Antecedent moisture condition (report Section 3.7.2). A failure here must never
+    # stop the rainfall card, so it is optional: the dashboard simply hides the AMC row.
+    try:
+        amc_block = amc.build_live_amc(
+            full, now.date(),
+            trigger_time=trigger_time,
+            trigger_rain_24h_mm=trigger_r24,
+            rain_24h_mm=obs_r24,
+        )
+    except Exception as e:
+        print("AMC calculation skipped:", e)
+        amc_block = None
+
+    # Rainfall-driven discharge forecast (forecast.py): soil wetness with the wet-season floor,
+    # unit hydrograph, baseflow, month-specific triggers. Also optional: a failure only hides the card.
+    try:
+        model_block = rain_model.live_model(full, now_str, load_thresholds())
+    except Exception as e:
+        print("Model forecast skipped:", e)
+        model_block = None
 
     return {
         "source": "Open-Meteo Forecast API",
@@ -124,6 +161,8 @@ def fetch_rainfall():
         "trigger_is_forecast": trigger_is_forecast,
         "observed": observed[-72:],
         "forecast": forecast[:168],
+        "amc": amc_block,
+        "model": model_block,
     }
 
 

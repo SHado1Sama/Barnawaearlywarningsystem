@@ -367,6 +367,31 @@
   .lead-badge .lbl{font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.05em; text-transform:uppercase; color:var(--ink-faint);}
   .case-sub{font-size:12px; color:var(--ink-soft); margin-bottom:10px;}
   .case-charts{display:flex; flex-direction:column; gap:2px;}
+  /* wet-season floor check, inside each case card */
+  .fc-block{margin-top:12px; padding-top:10px; border-top:1px solid var(--line);}
+  .fc-title{font-family:'Archivo',sans-serif; font-weight:800; font-size:13px; margin-bottom:2px;}
+  .fc-sub{font-size:12px; color:var(--ink-soft); margin-bottom:8px; line-height:1.45;}
+  .fc-row{display:grid; grid-template-columns:104px 1fr 76px 98px; align-items:center; gap:8px; margin:5px 0;}
+  .fc-name{font-size:12px; color:var(--ink-soft);}
+  .fc-track{position:relative; height:12px; background:var(--line); border-radius:2px;}
+  .fc-fill{position:absolute; left:0; top:0; bottom:0; border-radius:2px;}
+  .fc-fill.raw{background:var(--ink-faint);}
+  .fc-fill.floor{background:var(--accent);}
+  .fc-mark{position:absolute; top:-3px; bottom:-3px; width:0; border-left:2px dashed var(--ink);}
+  .fc-val{font-family:'IBM Plex Mono',monospace; font-size:12px; text-align:right;}
+  .fc-tag{font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-align:center; padding:2px 6px; border-radius:3px; letter-spacing:0.03em; text-transform:uppercase; white-space:nowrap;}
+  .fc-tag.ok{background:var(--status-normal-soft); color:var(--status-normal);}
+  .fc-tag.bad{background:var(--status-warning-soft); color:var(--status-warning);}
+  .fc-tag.none{background:var(--line); color:var(--ink-soft);}
+  .fc-legend{display:flex; flex-wrap:wrap; gap:4px 14px; font-size:11px; color:var(--ink-faint); margin:2px 0 6px;}
+  .fc-legend i{display:inline-block; width:14px; height:3px; margin-right:5px; vertical-align:middle;}
+  .fc-note{font-size:11.5px; color:var(--ink-soft); line-height:1.5; margin-top:6px;}
+  .mini-table{width:100%; border-collapse:collapse; font-size:12px; margin:8px 0 2px;}
+  .mini-table th{font-family:'IBM Plex Mono',monospace; font-weight:500; font-size:10.5px; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink-faint); text-align:right; padding:3px 6px; border-bottom:1px solid var(--line);}
+  .mini-table th:first-child, .mini-table td:first-child{text-align:left;}
+  .mini-table td{padding:3px 6px; text-align:right; font-family:'IBM Plex Mono',monospace; color:var(--ink-soft); border-bottom:1px solid var(--line);}
+  .mini-table tr:last-child td{border-bottom:none; color:var(--ink);}
+  @media (max-width:640px){ .fc-row{grid-template-columns:1fr 66px 92px;} .fc-name{grid-column:1 / -1;} .fc-track{grid-column:1;} }
 
   /* ---- live conditions ---- */
   .live-section{margin-bottom:22px;}
@@ -377,6 +402,8 @@
   .live-asof{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-faint);}
   .live-asof.stale{color:var(--status-warning); font-weight:600;}
   .live-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .live-grid > .card{min-width:0;}
+  @media (max-width:760px){ .live-grid{grid-template-columns:1fr;} }
   .live-card{padding:16px 18px;}
   .live-card-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px; gap:8px; flex-wrap:wrap;}
   .live-card-title{font-family:'Archivo',sans-serif; font-weight:700; font-size:14px;}
@@ -397,6 +424,18 @@
     font-size:11.5px; color:var(--ink-soft); line-height:1.5;
   }
   .proxy-note b{color:var(--ink);}
+  .amc-row{display:flex; align-items:center; flex-wrap:wrap; gap:6px 10px; margin:6px 0;}
+  .amc-label{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-faint); min-width:72px;}
+  .amc-pill{
+    display:inline-flex; align-items:center;
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; font-weight:600;
+    letter-spacing:0.03em; text-transform:uppercase;
+    padding:3px 9px; border-radius:100px;
+  }
+  .amc-pill.dry{background:var(--status-normal-soft); color:var(--status-normal);}
+  .amc-pill.avg{background:var(--status-watch-soft); color:var(--status-watch);}
+  .amc-pill.wet{background:var(--status-warning-soft); color:var(--status-warning);}
+  .amc-detail{font-size:12px; color:var(--ink-soft); line-height:1.45;}
   .live-missing{
     display:flex; flex-direction:column; gap:6px; align-items:flex-start;
     padding:22px 20px; color:var(--ink-soft); font-size:13px;
@@ -807,6 +846,17 @@
             searching backward from the peak. The gap between that rainfall trigger and the discharge peak
             is the case studies' "lead time," roughly 19&ndash;32 hours in these two events. That real lead
             time is why the live system watches rainfall as well as river flow.</p>
+            <p>The same two seasons are also replayed through the rainfall-driven forecast model. In the first
+            version, a dry 5-day spell in July&ndash;September made the model treat the ground as dry, which
+            absorbs the first 54&nbsp;mm of any storm. That is why the 97&nbsp;mm storm of 24&nbsp;Aug 2012 was
+            missed. The corrected model never uses the dry soil class from July to September; the case cards
+            above show the forecast with and without that floor.</p>
+            <p>The replay also showed a second fault. The forecast triggers had been made by multiplying the
+            design flows (Watch 1,836&nbsp;m³/s) by 0.2038, but the model adds baseflow at its true value, so
+            September baseflow (341&nbsp;m³/s) already used 91% of the 374&nbsp;m³/s Watch trigger and 2022
+            produced 13 false-alarm days. The triggers are now the month's baseflow plus 15.5% of the flow
+            above baseflow, which is the under-prediction measured at the 2004 event on the quickflow alone.
+            The Watch trigger is therefore 342&nbsp;m³/s in July, 454 in August and 573 in September.</p>
           </div>
         </div>
 
@@ -824,11 +874,25 @@
           </div>
         </div>
 
+        <div class="card step-card">
+          <div class="step-num">07</div>
+          <div class="step-body">
+            <h3>Rainfall-driven forecast on live rain</h3>
+            <p>Every 30 minutes the rain observed over the past three weeks (Open-Meteo) is run through the same
+            model as the case studies: soil wetness from the previous 5 days (never dry from July to September),
+            curve-number runoff, the unit hydrograph, and the month's baseflow. The highest flow in the next 7 days
+            is the predicted peak, compared with that month's triggers. Rain still to come is not used, because
+            forecast rainfall has not been tested against the record. This forecast can raise the headline above
+            the river-flow reading, marked "forecast". It is experimental and has been checked on two seasons only.</p>
+          </div>
+        </div>
+
       </div>
     </div>
 
     <footer class="notes">
       <span><b>Rainfall trigger.</b> For the 2012 and 2022 case studies, the trigger time is the most recent point before the discharge peak at which trailing 24-hour rainfall reached 20&nbsp;mm, used here as a stand-in for a forecast/nowcast rainfall alert.</span>
+      <span><b>Forecast checks.</b> The forecast replay uses rainfall from one grid cell near the catchment, so values are indicative. It covers two of the 36 seasons: it shows the 2012 miss is corrected and that no false-alarm days appear in those two seasons, but it is not a detection rate. The 2012 margin is modest (504 against a 454&nbsp;m³/s trigger). A full 36-year replay is still needed before quoting a new detection rate.</span>
       <span><b>Scope.</b> Episode detection merges exceedance days separated by a single dry day into one continuous episode. Data refreshes automatically every 30 minutes; see the Live conditions tab for the current fetch time.</span>
     </footer>
 
@@ -1224,6 +1288,69 @@
 
   // ---------------- case studies ----------------
   var caseGrid = document.getElementById('caseGrid');
+
+  // Forecast model check: what the rainfall-driven forecast says on the main storm day,
+  // without and with the July-September floor on soil wetness (computed in forecast.py).
+  var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function fcDay(iso){ return parseInt(iso.slice(8,10),10)+' '+MONTHS[parseInt(iso.slice(5,7),10)-1]; }
+  var FC_TAG = {
+    missed:      ['bad','Missed'],
+    caught:      ['ok','Caught'],
+    false_alarm: ['bad','False alarm'],
+    quiet:       ['none','No alert']
+  };
+  var SOIL = {I:'dry', II:'average', III:'wet'};
+  function fcBlock(cs){
+    var m = cs.model_check;
+    if(!m) return '';
+    var d = m.decision, trig = m.triggers.watch;
+    var top = Math.max(d.peak_raw, d.peak_floor, trig)*1.18;
+    var pct = function(v){ return Math.min(100, v/top*100).toFixed(1)+'%'; };
+    var row = function(name, cls, peak, outcome){
+      var tag = FC_TAG[outcome];
+      return '<div class="fc-row"><span class="fc-name">'+name+'</span>'+
+        '<span class="fc-track"><span class="fc-fill '+cls+'" style="width:'+pct(peak)+'"></span>'+
+        '<span class="fc-mark" style="left:'+pct(trig)+'"></span></span>'+
+        '<span class="fc-val">'+fmtNum(peak,0)+' m³/s</span>'+
+        '<span class="fc-tag '+tag[0]+'">'+tag[1]+'</span></div>';
+    };
+    var soil = (d.class_raw===d.class_floor)
+      ? 'Soil was already '+SOIL[d.class_raw]+' (AMC '+d.class_raw+'), so the floor changes nothing here.'
+      : 'Soil class: '+SOIL[d.class_raw]+' (AMC '+d.class_raw+') becomes '+SOIL[d.class_floor]+' (AMC '+d.class_floor+
+        ') with the floor, so the first '+d.ia_floor_mm.toFixed(1)+' mm of rain is absorbed instead of '+d.ia_raw_mm.toFixed(1)+' mm.';
+    var notes = [];
+    if(d.outcome_floor==='caught'){
+      notes.push('With the floor the forecast reaches the Watch trigger on '+fcDay(d.date)+', '+d.days_before_peak+
+        ' days before the observed peak on '+fcDay(cs.peak_time)+' ('+fmtNum(cs.peak_discharge,0)+' m³/s).');
+    }
+    if(d.outcome_floor==='quiet'){
+      notes.push('No alert is correct here: the observed peak ('+fmtNum(cs.peak_discharge,0)+' m³/s) stayed below the Watch flow ('+
+        fmtNum(DATA.thresholds.watch.discharge,0)+' m³/s).');
+    }
+    if(d.outcome_floor==='false_alarm'){
+      notes.push('The observed peak ('+fmtNum(cs.peak_discharge,0)+' m³/s) stayed below the Watch flow ('+
+        fmtNum(DATA.thresholds.watch.discharge,0)+' m³/s), so this Watch is a false alarm with or without the floor.');
+    }
+    var a = m.added_days;
+    notes.push('Days at Watch or above, July to October: '+m.alert_days_raw+' without the floor, '+m.alert_days_floor+' with it'+
+      (a.count ? ' (added: '+fcDay(a.first)+' to '+fcDay(a.last)+').' : ' (no change).'));
+    return '<div class="fc-block">'+
+      '<div class="fc-title">Forecast check: wet-season floor on soil wetness</div>'+
+      '<div class="fc-sub">'+fcDay(d.date)+': '+d.rain_mm.toFixed(1)+' mm of rain after '+d.antecedent_5d_mm.toFixed(1)+
+        ' mm in the previous 5 days. '+soil+'</div>'+
+      row('Without floor','raw',d.peak_raw,d.outcome_raw)+
+      row('With floor','floor',d.peak_floor,d.outcome_floor)+
+      '<div class="fc-sub" style="margin:4px 0 8px;">Dashed line: Watch trigger for this month, '+fmtNum(trig,0)+' m³/s. '+
+        (m.baseflow_aware
+          ? 'It is the monthly baseflow ('+fmtNum(m.baseflow_m3s,0)+' m³/s) plus '+(m.quickflow_bias*100).toFixed(1)+'% of the extra flow that marks Watch, so it is higher in September, when baseflow is high.'
+          : '(forecast scale).')+'</div>'+
+      '<canvas class="f-canvas" height="96" data-year="'+cs.year+'"></canvas>'+
+      '<div class="fc-legend"><span><i style="background:var(--ink-faint)"></i>Without floor</span>'+
+        '<span><i style="background:var(--accent)"></i>With floor</span>'+
+        '<span><i style="background:var(--ink)"></i>Watch trigger</span></div>'+
+      '<div class="fc-note">'+notes.join(' ')+'</div>'+
+    '</div>';
+  }
   DATA.case_studies.forEach(function(cs){
     var card = document.createElement('div');
     card.className = 'card case-card';
@@ -1239,7 +1366,8 @@
       '<div class="case-charts">'+
         '<canvas class="rain-canvas" height="70" data-year="'+cs.year+'"></canvas>'+
         '<canvas class="q-canvas" height="90" data-year="'+cs.year+'"></canvas>'+
-      '</div>';
+      '</div>'+
+      fcBlock(cs);
     caseGrid.appendChild(card);
   });
 
@@ -1318,6 +1446,68 @@
         ctx.font = '9.5px "IBM Plex Mono", monospace';
         ctx.fillText('Daily discharge (m³/s)', pad.l, 0);
       })();
+
+      // forecast peak per day, without and with the wet-season floor
+      (function(){
+        var fCanvas = caseGrid.querySelector('.f-canvas[data-year="'+cs.year+'"]');
+        var m = cs.model_check;
+        if(!fCanvas || !m) return;
+        var setup = setupCanvas(fCanvas);
+        var ctx=setup.ctx, W=setup.w, H=setup.h;
+        ctx.clearRect(0,0,W,H);
+        var fp = {l:44, r:10, t:12, b:4};
+        var plotW = W-fp.l-fp.r, plotH = H-fp.t-fp.b;
+        var data = m.days, trig = m.triggers.watch;
+        var trigTop = Math.max.apply(null, data.map(function(d){return d.trig;}));
+        var maxQ = Math.max(trigTop*1.12, Math.max.apply(null, data.map(function(d){return d.floor;}))*1.05);
+        var xScale = function(i){ return fp.l + (i/(data.length-1))*plotW; };
+        var yScale = function(q){ return fp.t + plotH - (q/maxQ)*plotH; };
+
+        ctx.strokeStyle = cssVar('--line'); ctx.lineWidth=1;
+        ctx.fillStyle = cssVar('--ink-faint');
+        ctx.font = '9.5px "IBM Plex Mono", monospace';
+        ctx.textAlign='right'; ctx.textBaseline='middle';
+        [0,1].forEach(function(t){
+          var q = maxQ*t, y = yScale(q);
+          ctx.beginPath(); ctx.moveTo(fp.l,y); ctx.lineTo(W-fp.r,y); ctx.stroke();
+          ctx.fillText(fmtNum(q,0), fp.l-6, y);
+        });
+
+        // the floor stops at the end of September
+        var offIdx = data.findIndex(function(d){ return parseInt(d.t.slice(5,7),10) > Math.max.apply(null, m.wet_season_months); });
+        if(offIdx>0){
+          var ox = xScale(offIdx);
+          ctx.strokeStyle = cssVar('--ink-faint'); ctx.setLineDash([2,3]);
+          ctx.beginPath(); ctx.moveTo(ox,fp.t); ctx.lineTo(ox,fp.t+plotH); ctx.stroke(); ctx.setLineDash([]);
+          ctx.fillStyle = cssVar('--ink-faint'); ctx.textAlign='left'; ctx.textBaseline='top';
+          ctx.fillText('floor off', ox+4, fp.t+1);
+        }
+
+        // Watch trigger
+        ctx.strokeStyle = cssVar('--ink'); ctx.lineWidth=1.2; ctx.setLineDash([4,3]);
+        ctx.beginPath();
+        data.forEach(function(d,i){ var x=xScale(i), y=yScale(d.trig); if(i===0) ctx.moveTo(x,y); else { ctx.lineTo(x, yScale(data[i-1].trig)); ctx.lineTo(x,y); } });
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        var line = function(key, color, width){
+          ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = width; ctx.lineJoin='round';
+          data.forEach(function(d,i){ var x=xScale(i), y=yScale(d[key]); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+          ctx.stroke();
+        };
+        line('raw', cssVar('--ink-faint'), 1.4);
+        line('floor', cssVar('--accent'), 1.8);
+
+        // storm day marker
+        var di = data.findIndex(function(d){ return d.t === m.decision.date; });
+        if(di>=0){
+          ctx.fillStyle = cssVar('--accent');
+          ctx.beginPath(); ctx.arc(xScale(di), yScale(data[di].floor), 3.5, 0, Math.PI*2); ctx.fill();
+          ctx.strokeStyle = cssVar('--surface-raised'); ctx.lineWidth=1.5; ctx.stroke();
+        }
+        ctx.fillStyle = cssVar('--ink-faint'); ctx.textAlign='left'; ctx.textBaseline='top';
+        ctx.fillText('Forecast peak per day (m³/s)', fp.l, 0);
+      })();
     });
   }
 
@@ -1354,6 +1544,7 @@
     warning: "River flow has crossed the level historically associated with flooding in low-lying and flood-prone areas.",
     emergency: "River flow has crossed the level historically associated with major flooding across the catchment."
   };
+  var MODEL_RAISES_BANNER = true;   // set to false to keep the headline on the river-flow reading only
   var HERO_ACTION_NORMAL = "No action needed right now. This page checks conditions automatically every 30 minutes — check back after heavy rain.";
 
   function buildHeroPanel(){
@@ -1406,9 +1597,24 @@
     var curLvl = g.current_level;
     var maxLvl = g.max_level || curLvl;
 
+    // The rainfall-driven forecast can raise the headline above the river-flow reading: rain that has
+    // already fallen can mean a flood peak a few days away while the river itself is still low.
+    var RANK = ['normal','watch','warning','emergency'];
+    var mdl = (MODEL_RAISES_BANNER && r && r.model) ? r.model : null;
+    var modelDrives = !!(mdl && RANK.indexOf(mdl.level) > RANK.indexOf(curLvl));
+    var riverMax = maxLvl;
+    if(modelDrives){
+      curLvl = mdl.level;
+      if(RANK.indexOf(maxLvl) < RANK.indexOf(curLvl)) maxLvl = curLvl;
+    }
+
     banner.dataset.level = curLvl;
-    levelText.textContent = LEVEL_LABEL[curLvl].toUpperCase();
-    explain.textContent = HERO_EXPLAIN[curLvl];
+    levelText.textContent = LEVEL_LABEL[curLvl].toUpperCase() + (modelDrives ? ' \u00b7 FORECAST' : '');
+    explain.textContent = modelDrives
+      ? 'Rain that has already fallen is expected to push the river to ' + LEVEL_LABEL[curLvl] + ' level ' +
+        (mdl.days_to_peak === 0 ? 'today' : 'in about ' + mdl.days_to_peak + ' day' + (mdl.days_to_peak === 1 ? '' : 's')) +
+        ' (about ' + fmtNum(mdl.predicted_peak,0) + ' m³/s). The river itself has not reached that level yet.'
+      : HERO_EXPLAIN[curLvl];
     action.textContent = curLvl === 'normal' ? HERO_ACTION_NORMAL : DATA.thresholds[curLvl].action;
 
     flowEl.innerHTML = fmtNum(g.forecast[0].med,0) + '<small>m³/s</small>';
@@ -1417,9 +1623,17 @@
     outlookEl.style.color = maxLvl === 'normal' ? '' : levelColor(maxLvl);
 
     var parts = [];
-    parts.push(maxLvl !== curLvl
-      ? 'The forecast shows conditions may rise to <b>' + LEVEL_LABEL[maxLvl] + '</b> level in the coming days.'
-      : 'The forecast shows conditions are expected to stay at the current level in the coming days.');
+    if(modelDrives){
+      parts.push('The river-flow forecast on its own stays at <b>' + LEVEL_LABEL[riverMax] + '</b>; the ' + LEVEL_LABEL[curLvl] +
+        ' level comes from the rainfall-driven forecast below.');
+    } else {
+      parts.push(maxLvl !== curLvl
+        ? 'The forecast shows conditions may rise to <b>' + LEVEL_LABEL[maxLvl] + '</b> level in the coming days.'
+        : 'The forecast shows conditions are expected to stay at the current level in the coming days.');
+    }
+    if(mdl){
+      parts.push('Rainfall-driven forecast: predicted peak <b>' + fmtNum(mdl.predicted_peak,0) + ' m³/s</b> (' + LEVEL_LABEL[mdl.level] + '), soil ' + mdl.soil_name + '.');
+    }
     if(r && r.trigger_time){
       parts.push(r.trigger_is_forecast
         ? 'Heavy rainfall (&ge;20mm in 24 hours) is forecast around <b>' + r.trigger_time.replace('T',' ') + '</b> &mdash; in the two recorded flood events on this site, river flow responded to that kind of rainfall within roughly 19&ndash;32 hours.'
@@ -1457,6 +1671,26 @@
     var grid = document.createElement('div');
     grid.className = 'live-grid';
 
+    // ---- antecedent moisture (AMC) rows, shown inside the rainfall card ----
+    var amcHtml = function(a){
+      if(!a || !a.now) return '';
+      var row = function(label, x, extra){
+        var cls = x.amc === 'III' ? 'wet' : (x.amc === 'I' ? 'dry' : 'avg');
+        var floorTxt = x.floor_applied ? ' &middot; wet-season floor: 5-day rule gave AMC '+x.amc_raw+' (dry)' : '';
+        return '<div class="amc-row"><span class="amc-label">'+label+'</span>'+
+          '<span class="amc-pill '+cls+'">AMC '+x.amc+' &middot; '+x.condition+'</span>'+
+          '<span class="amc-detail">'+x.antecedent_5d_mm.toFixed(1)+' mm in the 5 days before &middot; CN '+x.cn.toFixed(1)+
+          ' &middot; Ia '+x.ia_mm.toFixed(1)+' mm'+floorTxt+(extra || '')+'</span></div>';
+      };
+      var h = row('Soil now', a.now, ' &middot; last 24 h: '+a.now.rain_24h_mm.toFixed(1)+' mm rain gives '+a.now.runoff_24h_mm.toFixed(1)+' mm runoff');
+      if(a.trigger){
+        h += row('Before storm', a.trigger, ' &middot; '+a.trigger.rain_24h_mm.toFixed(1)+' mm rain gives '+a.trigger.runoff_24h_mm.toFixed(1)+' mm runoff');
+      }
+      h += '<div class="proxy-note">Soil condition follows the 5-day antecedent rainfall (dry below '+a.dry_below_mm+' mm, wet above '+a.wet_above_mm+
+           ' mm). Wet soil turns the same rain into more runoff. From July to September the soil is never treated as dry (wet-season floor).</div>';
+      return h;
+    };
+
     // ---- rainfall card ----
     var rc = document.createElement('div');
     rc.className = 'card live-card';
@@ -1472,6 +1706,7 @@
         '<div class="rolling-readout"><span class="num">'+r.rolling_24h_mm.toFixed(1)+'<span style="font-size:14px;">mm</span></span>'+
         '<span class="of">/ ' + r.trigger_threshold_mm_24h.toFixed(0) + 'mm trailing 24h trigger'+
         (r.trigger_time ? ' · ' + (r.trigger_is_forecast ? 'expected ' : 'reached ') + r.trigger_time : '') + '</span></div>'+
+        amcHtml(r.amc)+
         '<div class="chart-wrap"><canvas id="liveRainChart" height="110"></canvas><div class="tooltip" id="liveRainTooltip"></div></div>'+
         '<div class="legend-row" style="margin-top:8px; padding-top:8px;">'+
           '<span class="legend-item"><span class="legend-swatch" style="background:'+cssVar('--rain')+'"></span>Observed (past 48h)</span>'+
@@ -1481,6 +1716,44 @@
       rc.innerHTML = '<div class="live-card-title">Rainfall</div><div class="proxy-note">Unavailable this fetch'+(LIVE.error?': '+LIVE.error:'')+'.</div>';
     }
     grid.appendChild(rc);
+
+    // ---- rainfall-driven forecast card (soil wetness, wet-season floor) ----
+    if(LIVE.rainfall && LIVE.rainfall.model){
+      var md = LIVE.rainfall.model;
+      var mc = document.createElement('div');
+      mc.className = 'card live-card';
+      var mCol = md.level === 'normal' ? cssVar('--status-normal') : levelColor(md.level);
+      var mSoft = md.level === 'normal' ? cssVar('--status-normal-soft') : cssVar('--status-'+md.level+'-soft');
+      var sCls = md.soil === 'III' ? 'wet' : (md.soil === 'I' ? 'dry' : 'avg');
+      var peakWhen = md.days_to_peak === 0 ? 'peak expected today' : 'peak in about '+md.days_to_peak+' day'+(md.days_to_peak===1?'':'s');
+      var lvlTxt = function(l){ return '<span style="color:'+(l==='normal'?cssVar('--status-normal'):levelColor(l))+';">'+LEVEL_LABEL[l]+'</span>'; };
+      var rowsHtml = md.recent.map(function(x){
+        return '<tr><td>'+fcDay(x.t)+'</td><td>'+x.rain_mm.toFixed(1)+'</td><td>'+SOIL[x.soil]+'</td><td>'+fmtNum(x.peak,0)+'</td><td>'+lvlTxt(x.level)+'</td></tr>';
+      }).join('');
+      var floorNote;
+      if(md.floor_active){
+        floorNote = md.predicted_peak !== md.predicted_peak_without_floor
+          ? 'The wet-season floor is on (July to September). Without it this forecast would be <b>'+fmtNum(md.predicted_peak_without_floor,0)+' m³/s</b> ('+LEVEL_LABEL[md.level_without_floor]+').'
+          : 'The wet-season floor is on (July to September); it makes no difference today.';
+      } else {
+        floorNote = 'The wet-season floor applies from July to September, so the soil class here follows the 5-day rainfall rule alone.';
+      }
+      mc.innerHTML =
+        '<div class="live-card-head"><span class="live-card-title">Rainfall-driven forecast</span>'+
+        '<span class="trigger-pill" style="background:'+mSoft+'; color:'+mCol+';">'+LEVEL_LABEL[md.level]+'</span></div>'+
+        '<div class="rolling-readout"><span class="num">'+fmtNum(md.predicted_peak,0)+'<span style="font-size:14px;">m³/s</span></span>'+
+        '<span class="of">predicted peak, '+peakWhen+' &middot; Watch trigger this month '+fmtNum(md.triggers.watch,0)+' m³/s</span></div>'+
+        '<div class="amc-row"><span class="amc-label">Soil today</span>'+
+          '<span class="amc-pill '+sCls+'">AMC '+md.soil+' &middot; '+md.soil_name+'</span>'+
+          '<span class="amc-detail">'+md.antecedent_5d_mm.toFixed(1)+' mm in the 5 days before'+
+          (md.soil !== md.soil_raw ? ' &middot; the 5-day rule gave AMC '+md.soil_raw+' (dry)' : '')+
+          ' &middot; '+md.rain_today_mm.toFixed(1)+' mm so far today</span></div>'+
+        '<table class="mini-table"><thead><tr><th>Day</th><th>Rain mm</th><th>Soil</th><th>Peak m³/s</th><th>Level</th></tr></thead><tbody>'+rowsHtml+'</tbody></table>'+
+        '<div class="proxy-note">'+floorNote+' Each row is what the forecast said on that day, using only the rain that had fallen by then. '+
+        'Rain still to come is not used, because forecast rainfall has not been tested against the record. '+
+        'Experimental: tested on two flood seasons, and it adds to the river-flow reading above without replacing it.</div>';
+      grid.appendChild(mc);
+    }
 
     // ---- geoglows card ----
     var gc = document.createElement('div');
