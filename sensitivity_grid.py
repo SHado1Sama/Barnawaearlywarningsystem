@@ -1,8 +1,9 @@
 """
 Sensitivity of the v3 design settings: spell cap {4, 6, 8} days x dry gap {1, 2} days.
 Uses cumulative.effective_runoff_series' own parameters; same replay scoring as
-replay_v3.py. The cap 6 / gap 1 row must reproduce 43 alert days, 27 false, 4 of 6
-(revised fixed-CN design, Addendum 6 of V3_TEST_REPORT.md).
+replay_v3.py. The cap 6 / gap 1 row must reproduce 50 alert days, 30 false, 5 of 6
+(revised fixed-CN design on the corrected rainfall series, Addenda 6
+and 7 of V3_TEST_REPORT.md).
 """
 import sys, os, json
 from datetime import date, timedelta
@@ -11,7 +12,7 @@ import pandas as pd
 import forecast, cumulative
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-rain = pd.read_csv(os.path.join(HERE, "rain_era5_redownload_1990_2025.csv"), parse_dates=["Date"])
+rain = pd.read_csv(os.path.join(HERE, "rain_corrected_1990_2025.csv"), parse_dates=["Date"])
 daily = {d.date(): float(v) for d, v in zip(rain["Date"], rain["Precipitation_mm"])}
 ews = json.load(open(os.path.join(HERE, "ews_data.json")))
 obs = {date.fromisoformat(x["t"]): float(x["q"]) for x in ews["daily_series"]}

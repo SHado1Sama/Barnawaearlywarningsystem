@@ -387,3 +387,61 @@ spell's runoff no longer depends on the antecedent rain and that a
 January spell also uses CN II. The original design's figures
 remain in the body of this report and in Addendum 5; nothing above
 rewrites them.
+
+## Addendum 7, 9 Nov 2026: one record, on the corrected rainfall series
+
+The owner directed that the dashboard stop carrying two records
+(the 36-year replay on the archive rainfall, plus the separate
+flood-years passage from Addendum 5) and instead run the long
+replay on a single corrected series: the 36-year series with its
+2024 replaced by the correct direct Copernicus data. This addendum
+records that consolidation. The models themselves did not change
+in this step (v2 as defended and floored, v3 as revised in
+Addendum 6).
+
+The corrected file is rain_corrected_1990_2025.csv: 13,149 days,
+1990-01-01 to 2025-12-31, identical to
+rain_era5_redownload_1990_2025.csv on every day except in 2024,
+where the 366 days are the direct CDS daily totals from
+rain_cds_flood_years.csv (annual total 984.3 mm against the archive
+file's 736.0 mm). No other year was replaced: for 1999 to 2014 the
+direct and archive series agree to within 0.65 mm on any day
+(Addendum 5), so replacing them would change nothing. The archive
+file stays in the repo as the historical input the earlier
+addenda were scored on; the live build uses neither file, it
+fetches fresh data every run.
+
+The single record, scored with the unchanged rules (replay_v3.py
+for v3, the same scorer for v2):
+
+Primary model (v2, Watch trigger): 17 alert days, 3 false alarm
+days (all trailing a caught flood, so no false-alarm occasions),
+3 of 6 episodes caught (2004 lead 2, 2012 lead 3, 2024 lead 3).
+Every one of its alert days falls in those three years, which
+reconciles exactly with the per-year settling in Addendum 5.
+
+Supplementary model (v3), Watch trigger: 50 alert days, 30 false,
+10 occasions (a flood followed on 5), 5 of 6 episodes caught
+(1999 lead 2, 2004 lead 2, 2012 lead 3, 2014 lead 0, 2024 lead 3;
+only 2008 missed, as before). Advisory trigger, the level the card
+signals: 122 alert days, 65 false, 22 occasions, all 6 episodes
+caught (2008 lead 1, 2014 lead 2, the rest as at Watch); the river
+reached the Advisory flow after 12 of the 22 occasions, and on 4
+of the other 10 it still rose to between 1,000 m3/s and the
+Advisory flow; a signal occurred in 18 of 36 years, mostly in
+August.
+
+Sensitivity on the corrected series (sensitivity_grid.py), Watch
+trigger: cap 4 catches 3 of 6 with 15 false days at gap 1 (9 at
+gap 2); cap 6 catches 5 of 6 with 30 false at gap 1 and 4 of 6
+with 41 at gap 2; cap 8 catches 5 of 6 with 68 false at gap 1
+(92 at gap 2). Cap 6 with gap 1 keeps the joint-best catch with
+the fewest false days, so the bound stands again.
+
+Presentation: the dashboard card now prints this one record, with
+a short rainfall note where the flood-years passage used to be,
+and cumulative.py's validation block no longer carries the
+separate flood_years_cds entry. replay_v3.py and
+sensitivity_grid.py now read the corrected file, and
+daily_replay_v3.csv is regenerated from it (50 alert days,
+20 verified, 30 false at the Watch trigger).

@@ -42,23 +42,19 @@ Everything downstream is v2 unchanged: unit hydrograph, monthly baseflow,
 baseflow-aware triggers, classification.
 
 Honest status, from the full 36-year test (V3_TEST_REPORT.md in this
-repo): at the Watch trigger it catches 4 of 6 observed flood episodes
-(v2: 2 of 6) at 43 alert days with 27 false alarm days (v2: 12 and 2);
-at the Advisory trigger, the level this card actually signals, it
-catches 5 of 6 (only 2024 missed) at 115 alert days in 21 occasions.
-That replay runs on the archive rainfall series stored in this repo
-(rain_era5_redownload_1990_2025.csv). The six flood years were later
-re-settled on rainfall downloaded directly from the Copernicus
-Climate Data Store (Addenda 5 and 6 of the test report): for 1999 to
-2014 the two series agree to within 0.65 mm on any day, but the
-archive series understates 2024 rainfall by about a third, and on
-the direct rainfall both models catch 2024. Across the six flood
-years on the direct rainfall this model catches 6 of 6 at the
-Advisory trigger (18 false alarm days) and 5 of 6 at the Watch
-trigger (7 false alarm days, and no false occasion: every Watch
-signal cluster was followed by a real Watch-level flow), and v2
-catches 3 of 6 (3 false alarm days). It is a detection-first
-experimental variant, not a replacement for v2.
+repo): at the Watch trigger it catches 5 of 6 observed flood
+episodes (v2: 3 of 6) at 50 alert days with 30 false alarm days
+(v2: 17 and 3); at the Advisory trigger, the level this card
+actually signals, it catches 6 of 6 at 122 alert days in 22
+occasions. The replay runs on the corrected rainfall series stored
+in this repo (rain_corrected_1990_2025.csv): the archive
+re-download series with 2024 replaced by rainfall downloaded
+directly from the Copernicus Climate Data Store, after the archive
+series was found to understate 2024 by about a third (Addenda 5
+to 7 of the test report). For 1999 to 2014 the direct and archive
+series agree to within 0.65 mm on any day, so 2024 was the only
+year replaced. It is a detection-first experimental variant, not
+a replacement for v2.
 """
 import amc
 
@@ -131,50 +127,29 @@ import forecast
 from datetime import date as _date
 
 # Full 36-year replay validation of this supplementary model,
-# scored exactly as the primary model: see V3_TEST_REPORT.md. The replay
-# runs on the archive rainfall series stored in this repo; the separate
-# flood_years_cds block below re-settles the six flood years on direct
-# Copernicus CDS rainfall.
+# scored exactly as the primary model: see V3_TEST_REPORT.md. The
+# replay runs on the corrected rainfall series stored in this repo
+# (rain_corrected_1990_2025.csv; Addendum 7 of the test report).
 REPLAY_STATS = {
     "period": "1990-2025",
     # Occasions are clusters of alert days, split when the gap between
     # alert days exceeds 2 days.
     "watch_tier": {
-        "alert_days": 43, "false_alarm_days": 27,
-        "occasions": 9, "occasions_flood_followed": 4, "occasions_no_flood": 5,
-        "episodes_caught": 4, "episodes_total": 6, "missed": "2008 and 2024",
+        "alert_days": 50, "false_alarm_days": 30,
+        "occasions": 10, "occasions_flood_followed": 5, "occasions_no_flood": 5,
+        "episodes_caught": 5, "episodes_total": 6, "missed": "2008",
     },
     "advisory_tier": {
-        "alert_days": 115, "occasions": 21,
-        "years_with_signal": 17, "mostly_month": "August",
-        "episodes_caught": 5, "episodes_total": 6, "missed": "2024",
-        "occasions_followed_by_advisory_flow": 11,
+        "alert_days": 122, "occasions": 22,
+        "years_with_signal": 18, "mostly_month": "August",
+        "episodes_caught": 6, "episodes_total": 6, "missed": "",
+        "occasions_followed_by_advisory_flow": 12,
         "occasions_below_advisory": 10, "of_those_rose_1000_to_advisory": 4,
         "advisory_flow_m3s": 1357.7,
     },
-    "primary_alert_days": 12,
-    "primary_false_alarm_days": 2,
-    "primary_episodes_caught": 2,
-    # The six flood years re-settled on rainfall downloaded directly
-    # from the Copernicus Climate Data Store (Nov 2026), scored year by
-    # year with the same rules (see flood_years_cds.py and Addenda 5
-    # and 6 of V3_TEST_REPORT.md; Addendum 5 settled the rainfall and
-    # scored the original AMC-based design, Addendum 6 scores this
-    # revised fixed-CN design). For 1999-2014 the direct series and the
-    # archive series above agree to within 0.65 mm on any day; the
-    # archive series understates 2024 by about a third, which is why
-    # the episode counts differ from the 36-year replay.
-    "flood_years_cds": {
-        "source": "Copernicus CDS ERA5, direct download",
-        "settled": "2026-11",
-        "years": [1999, 2004, 2008, 2012, 2014, 2024],
-        "episodes_total": 6,
-        "advisory_episodes_caught": 6,
-        "advisory_false_alarm_days": 18,
-        "watch_episodes_caught": 5, "watch_missed": "2008",
-        "watch_false_alarm_days": 7,
-        "primary_episodes_caught": 3, "primary_false_alarm_days": 3,
-    },
+    "primary_alert_days": 17,
+    "primary_false_alarm_days": 3,
+    "primary_episodes_caught": 3,
 }
 
 
@@ -204,8 +179,8 @@ def live_model_v3(full_series, now_str, thresholds, advisory_discharge):
     SUPPLEMENTARY BY DESIGN: this block is advisory only. It must never drive
     the dashboard headline level (that stays with the river reading and the
     primary forecast in forecast.live_model). It exists because in the
-    36-year replay it caught 4 of 6 flood episodes against the primary
-    model's 2 of 6, but with 27 false alarm days against the primary's 2
+    36-year replay it caught 5 of 6 flood episodes against the primary
+    model's 3 of 6, but with 30 false alarm days against the primary's 3
     at the Watch trigger, so its signals are shown as Advisory, not Watch.
     The card prints the record for the Advisory trigger it signals at,
     with the Watch-trigger record as a secondary line.

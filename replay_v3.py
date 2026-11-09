@@ -1,8 +1,10 @@
 """Full 36-year replay of the v3 bounded cumulative model, scored exactly as replay_36yr.py scored v2.
 
 Scores the revised design of 9 Nov 2026 (curve number fixed at CN II, no AMC
-classes, no wet-season floor; see Addendum 6 of V3_TEST_REPORT.md). The
-original AMC-based design's replay figures are preserved in the report.
+classes, no wet-season floor; see Addendum 6 of V3_TEST_REPORT.md) on the
+corrected rainfall series (rain_corrected_1990_2025.csv: the archive
+re-download with 2024 replaced by the direct Copernicus CDS series;
+Addendum 7). The original design's replay figures are preserved in the report.
 """
 import json, os, sys
 from datetime import date, timedelta
@@ -11,7 +13,7 @@ import amc, forecast, cumulative
 import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-rain = pd.read_csv(os.path.join(HERE, "rain_era5_redownload_1990_2025.csv"), parse_dates=["Date"])
+rain = pd.read_csv(os.path.join(HERE, "rain_corrected_1990_2025.csv"), parse_dates=["Date"])
 daily_mm = {d.date(): float(v) for d, v in zip(rain["Date"], rain["Precipitation_mm"])}
 ews = json.load(open(os.path.join(HERE, "ews_data.json")))
 thresholds = ews["thresholds"]
