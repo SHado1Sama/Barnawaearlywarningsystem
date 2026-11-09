@@ -149,6 +149,8 @@ REPLAY_STATS = {
     },
     "primary_alert_days": 17,
     "primary_false_alarm_days": 3,
+    "primary_occasions": 3,
+    "primary_false_occasions": 0,
     "primary_episodes_caught": 3,
 }
 

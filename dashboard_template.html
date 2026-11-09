@@ -906,7 +906,7 @@
             curve-number runoff, the unit hydrograph, and the month's baseflow. The highest flow in the next 7 days
             is the predicted peak, compared with that month's triggers. Rain still to come is not used, because
             forecast rainfall has not been tested against the record. This forecast can raise the headline above
-            the river-flow reading, marked "forecast". It is experimental and has been checked on two seasons only.</p>
+            the river-flow reading, marked "forecast". It is experimental; it was first checked on the two case-study seasons, and has since been replayed over the full 1990 to 2025 record (see Forecast checks below).</p>
           </div>
         </div>
 
@@ -915,7 +915,7 @@
 
     <footer class="notes">
       <span><b>Rainfall trigger.</b> For the 2012 and 2022 case studies, the trigger time is the most recent point before the discharge peak at which trailing 24-hour rainfall reached 20&nbsp;mm, used here as a stand-in for a forecast/nowcast rainfall alert.</span>
-      <span><b>Forecast checks.</b> The forecast replay uses rainfall from one grid cell near the catchment, so values are indicative. It covers two of the 36 seasons: it shows the 2012 miss is corrected and that no false-alarm days appear in those two seasons, but it is not a detection rate. The 2012 margin is modest (504 against a 454&nbsp;m³/s trigger). A full 36-year replay is still needed before quoting a new detection rate.</span>
+      <span><b>Forecast checks.</b> The case studies above replay two seasons in detail, using rainfall from one grid cell near the catchment, so their values are indicative; the 2012 margin is modest (504 against a 454&nbsp;m&sup3;/s trigger). Both forecast models have since been replayed over the full 1990 to 2025 record, on the corrected rainfall series described on the cumulative model&rsquo;s card: the primary model issued 17 Watch alert days, caught 3 of the 6 recorded floods (2004, 2012 and 2024, each 2 to 3 days ahead), and 3 of its alert days were not followed by a flood, all of them trailing days of floods it had already caught. The supplementary model&rsquo;s full record is printed on its card. These are hindcast checks on the same record the thresholds were fitted to, so treat the scores as design checks, not as a guaranteed detection rate.</span>
       <span><b>Scope.</b> Episode detection merges exceedance days separated by a single dry day into one continuous episode. Data refreshes automatically every 30 minutes; see the Live conditions tab for the current fetch time.</span>
     </footer>
 
@@ -1796,11 +1796,12 @@
         '<span class="of">predicted peak, '+vPeakWhen+' &middot; Advisory trigger this month '+fmtNum(v3.triggers.advisory,0)+' m&sup3;/s &middot; Watch trigger '+fmtNum(v3.triggers.watch,0)+' m&sup3;/s</span></div>'+
         '<div class="proxy-note">'+(v3.signal === 'none' ? 'No build-up of rain is forming at the moment. ' : '<b>A build-up of rain is forming. Watch the river.</b> ')+
         'This second model accumulates moderate rain across a wet spell instead of charging the soil abstraction in full every day, so it sees build-ups the primary forecast misses. '+
-        'Its record at the Advisory level it signals at, over the '+vv.period+' record: the signal fired on '+va.occasions+' occasions ('+va.alert_days+' days, about once a year, in '+va.years_with_signal+' of 36 years, mostly in '+va.mostly_month+'). '+
+        'Its record at the Advisory level it signals at, over the '+vv.period+' record: the signal fired on '+va.occasions+' occasions ('+va.alert_days+' days in total, about two occasions every three years, spread over '+va.years_with_signal+' of the 36 years, mostly in '+va.mostly_month+'). '+
         'It preceded '+va.episodes_caught+' of the '+va.episodes_total+' recorded floods'+(va.missed ? ', missing only '+va.missed : ', missing none')+'. The river went on to reach the Advisory flow ('+fmtNum(va.advisory_flow_m3s,0)+' m&sup3;/s) after '+va.occasions_followed_by_advisory_flow+' of the '+va.occasions+' occasions, '+
         'and on '+va.of_those_rose_1000_to_advisory+' of the other '+va.occasions_below_advisory+' it still rose to between 1,000 m&sup3;/s and the Advisory flow. '+
-        'At the higher Watch trigger the same model is rarer and sharper: '+vw.occasions+' occasions, '+vw.alert_days+' days, preceding '+vw.episodes_caught+' of '+vw.episodes_total+' floods (missing '+vw.missed+'), with '+vw.false_alarm_days+' days not followed by a flood, '+
-        'against the primary model\'s '+vv.primary_alert_days+' alert days and '+vv.primary_false_alarm_days+' false. '+
+        'At the higher Watch trigger the same model is rarer and sharper: '+vw.occasions+' occasions, '+vw.alert_days+' days, preceding '+vw.episodes_caught+' of '+vw.episodes_total+' floods (missing '+vw.missed+'). '+
+        'False alarms are counted two ways. By day (a day is false if no Watch-level flow followed within 7 days): '+vw.false_alarm_days+' of this model\'s '+vw.alert_days+' Watch days were false, against '+vv.primary_false_alarm_days+' of the primary model\'s '+vv.primary_alert_days+' alert days. '+
+        'By occasion (a cluster of alert days, split when the gap exceeds 2 days, is false if no flood followed it at all): '+vw.occasions_no_flood+' of this model\'s '+vw.occasions+' Watch occasions were false, while the primary model\'s '+vv.primary_false_alarm_days+' false days all fell inside occasions that caught their flood, so it has no false occasions. '+
         '<b>Rainfall note:</b> this record runs on the project rainfall series with 2024 taken from a direct Copernicus download, after the archive series first used was found to understate that year by about a third. '+
         '<b>Experimental:</b> added after the project defence, not part of the defended report, and designed after studying the same record it is scored on, '+
         'so this record is a design check, not proof; only future flood seasons can test it. It is <b>advisory only</b>: it never raises the headline level on this page, which stays with the river reading and the primary forecast above.</div>';
