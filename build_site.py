@@ -2,6 +2,10 @@
 Build the public Barnawa EWS site: reads dashboard_template.html, splices in
 the fonts (from ./fonts/*.woff2), the historical ews_data.json, and the live
 live_data.json (if present), and writes dist/index.html for GitHub Pages.
+Also places the visitor site guide in dist/ so the download link on the
+page resolves: the deck is stored in the repo base64-encoded as
+Barnawa_EWS_Site_Walkthrough.pptx.b64 (the repo's file pipeline is
+text-only), and this build decodes it back to the .pptx.
 
 Pure standard library, so CI needs nothing beyond a Python interpreter.
 """
@@ -54,3 +58,12 @@ with open("dist/index.html", "w", encoding="utf-8") as f:
     f.write(out)
 
 print("wrote dist/index.html, bytes:", len(out.encode("utf-8")))
+
+_guide_b64 = os.path.join(HERE, "Barnawa_EWS_Site_Walkthrough.pptx.b64")
+_guide_out = os.path.join("dist", "Barnawa_EWS_Site_Walkthrough.pptx")
+if os.path.exists(_guide_b64):
+    with open(_guide_b64, encoding="ascii") as f:
+        _guide_bytes = base64.b64decode(f.read())
+    with open(_guide_out, "wb") as f:
+        f.write(_guide_bytes)
+    print("decoded site guide into dist/, bytes:", len(_guide_bytes))

@@ -268,6 +268,21 @@
   button.ctrl:hover{border-color:var(--accent); color:var(--accent-deep);}
   button.ctrl.primary{background:var(--accent); border-color:var(--accent); color:var(--on-accent);}
   button.ctrl.primary:hover{background:var(--accent-deep); border-color:var(--accent-deep); color:var(--on-accent);}
+  a.ctrl{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.03em;
+    border:1px solid var(--accent);
+    background:var(--accent);
+    color:var(--on-accent);
+    padding:6px 12px;
+    border-radius:6px;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    text-decoration:none;
+  }
+  a.ctrl:hover{background:var(--accent-deep); border-color:var(--accent-deep); color:var(--on-accent);}
   select.jump{
     font-family:'IBM Plex Mono', monospace;
     font-size:12px;
@@ -631,6 +646,14 @@
         This system covers the ~3,809&nbsp;km&sup2; basin draining to the Barnawa outlet; the deep-colored
         area is the flood-modeled footprint these alert levels are built around.
       </div>
+    </div>
+
+    <div class="cta-card">
+      <div>
+        <div class="cta-title">New here? Take the guided tour of this site</div>
+        <div class="cta-sub">A short PowerPoint walkthrough (14 slides) explains every part of this page and the record behind it, screenshot by screenshot: what each reading means, how the alert levels are set, and how the two forecast models work.</div>
+      </div>
+      <a class="ctrl" href="Barnawa_EWS_Site_Walkthrough.pptx" download>Download the site guide (PowerPoint)</a>
     </div>
 
     <button class="ctrl detail-toggle" id="detailToggleBtn" type="button">&#9662; Show live data detail (charts)</button>
