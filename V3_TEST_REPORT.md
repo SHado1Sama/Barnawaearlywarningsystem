@@ -311,3 +311,79 @@ supplementary model's value is its catch rate at the Advisory
 level, and the dashboard arrangement (v2 primary, v3 supplementary
 advisory only) stands. Any detection rate quoted from this project
 should name its rainfall source.
+
+## Addendum 6, 9 Nov 2026: the supplementary model revised, curve number fixed at CN II
+
+The owner asked what the supplementary model would look like with
+the AMC logic and the wet-season floor removed, keeping the 6-day
+compounding. It was tested before anything was changed, on both
+records, and the result was one-sided enough that he approved the
+revision the same day. This addendum records it. The primary model
+is untouched, and the dashboard arrangement is unchanged.
+
+What changed, in cumulative.py only: each spell originally took the
+AMC class of the 5 days before it (with the wet-season floor), so a
+spell starting on wet ground ran at CN III. The revision fixes the
+curve number at CN II, the average-condition value, for every
+spell. The spell cap (6 days), the dry break (1 day), lambda (0.20)
+and everything downstream are unchanged. The live layer no longer
+reports a without-floor peak for this model, since there is no
+floor in it to remove.
+
+Why it works: CN III has a much smaller retention than CN II, so
+six days of compounding at CN III turns ordinary wet spells into
+modelled flood peaks. Those spells were most of the false alarms.
+The flood events themselves carry enough cumulative rain to cross
+the triggers at CN II, so the catches survive while the inflated
+non-events fall away. Two side findings from the same tests:
+removing only the floor while keeping AMC collapsed the flood-year
+Watch record to 2 of 6 (the floor only ever mattered because AMC I
+existed), and the revision removes a fitted choice rather than
+adding one, which is the right direction for a model scored on its
+own design record. The in-sample warning from the main report
+still applies in full.
+
+Results, scored with the unchanged scripts (replay_v3.py for the
+36-year archive replay, flood_years_cds.py for the flood years;
+occasions as defined in Addendum 4; Advisory false days counted
+under the report's standing 7-day rule at the Advisory discharge):
+
+36-year replay, archive rainfall, Watch trigger: 68 alert days,
+52 false, 14 occasions, 4 of 6 caught, becomes 43 alert days,
+27 false, 9 occasions, 4 of 6 caught (same episodes: 1999, 2004,
+2012, 2014; a flood followed on 4 occasions, not on 5, previously
+10). Advisory trigger: 206 alert days in 31 occasions becomes
+115 alert days in 21 occasions, catches unchanged at 5 of 6 (only
+2024 missed, an artefact of the archive rainfall); the river
+reached the Advisory flow after 11 of the 21 occasions, and on 4
+of the other 10 it still rose to between 1,000 m3/s and the
+Advisory flow; a signal occurred in 17 of 36 years, mostly in
+August; Advisory false days are 62 under the rule above.
+
+Six flood years, direct Copernicus rainfall, Watch trigger:
+42 alert days, 21 false, 5 of 6 caught, becomes 28 alert days,
+7 false, 5 of 6 caught, in 5 occasions of which none was false
+(every Watch signal cluster was followed by a real Watch-level
+flow). Per year (alert days, false days, lead): 1999: 4, 1, 2.
+2004: 7, 1, 2. 2008: no Watch alerts, the one miss, caught at
+Advisory as before; the original design raised 9 false Watch days
+in 2008, the revision raises none. 2012: 6, 2, 3. 2014: 4, 0, 2.
+2024: 7, 3, 3. Advisory trigger: all 6 episodes still caught, with
+50 alert days and 18 false days (was 77 and 36), in 7 occasions of
+which 1 was false. The v2 figures in Addendum 5 are unchanged and
+were reproduced exactly by the same run.
+
+Sensitivity, archive replay, revised design (sensitivity_grid.py):
+cap 4 catches 2 of 6 with 13 false days at gap 1 (8 at gap 2);
+cap 6 catches 4 of 6 with 27 false at gap 1 and 3 of 6 with 39 at
+gap 2; cap 8 catches 4 of 6 with 64 false at gap 1 (89 at gap 2).
+Cap 6 with gap 1 is where the catches peak, so the bound settled
+in the main report stands for a new reason.
+
+Artefacts: replay_v3.py now scores the single revised design and
+regenerates daily_replay_v3.csv (the peak column is renamed
+PredPeak_V3_m3s); test_cumulative.py gained two checks, that a
+spell's runoff no longer depends on the antecedent rain and that a
+January spell also uses CN II. The original design's figures
+remain in the body of this report and in Addendum 5; nothing above
+rewrites them.

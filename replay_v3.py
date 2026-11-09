@@ -1,4 +1,9 @@
-"""Full 36-year replay of the v3 bounded cumulative model, scored exactly as replay_36yr.py scored v2."""
+"""Full 36-year replay of the v3 bounded cumulative model, scored exactly as replay_36yr.py scored v2.
+
+Scores the revised design of 9 Nov 2026 (curve number fixed at CN II, no AMC
+classes, no wet-season floor; see Addendum 6 of V3_TEST_REPORT.md). The
+original AMC-based design's replay figures are preserved in the report.
+"""
 import json, os, sys
 from datetime import date, timedelta
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -42,38 +47,33 @@ def score(peaks):
             "episodes_caught": sum(1 for x in ev if x["caught"]), "episodes": ev,
             "alert_dates": [d.isoformat() for d in alert]}
 
-results = {}
-for floor in (False, True):
-    eff = cumulative.effective_runoff_series(daily_mm, floor=floor)
-    peaks = peaks_from_eff(eff)
-    results[floor] = (peaks, score(peaks))
-    s = results[floor][1]
-    print(f"v3 floor={floor}: alerts {s['alert_days']}, verified {s['verified']}, false {s['false_alarm_days']}, caught {s['episodes_caught']}/6")
-    print("   episodes:", [(e["peak_date"], e["caught"], e["lead_days"]) for e in s["episodes"]])
+eff = cumulative.effective_runoff_series(daily_mm)
+peaks = peaks_from_eff(eff)
+s = score(peaks)
+print(f"v3 fixed CN II: alerts {s['alert_days']}, verified {s['verified']}, false {s['false_alarm_days']}, caught {s['episodes_caught']}/6")
+print("   episodes:", [(e["peak_date"], e["caught"], e["lead_days"]) for e in s["episodes"]])
 
-peaks = results[True][0]
 rows = [{"Date": d.isoformat(), "Rain_mm": round(daily_mm[d], 3), "Observed_Q_m3s": observed[d],
-         "PredPeak_V3Floor_m3s": round(peaks[d], 1),
+         "PredPeak_V3_m3s": round(peaks[d], 1),
          "Forecast_Watch_Trigger_m3s": round(forecast.forecast_triggers(thresholds, d.month)["watch"], 1)} for d in days]
 pd.DataFrame(rows).to_csv(os.path.join(HERE, "daily_replay_v3.csv"), index=False)
-json.dump({"floor": results[True][1], "no_floor": results[False][1]}, open(os.path.join(HERE, "replay_v3_summary.json"), "w"), indent=2)
+json.dump({"fixed_cn2": s}, open(os.path.join(HERE, "replay_v3_summary.json"), "w"), indent=2)
 
 # Case-study seasons under v3 (rainfall as stored in ews_data.json, as replay_case uses)
 for cs in ews["case_studies"]:
     daily = amc.daily_totals(cs["rainfall_hourly"])
     ds = sorted(daily)
-    for floor in (False, True):
-        eff_map = cumulative.effective_runoff_series(daily, floor=floor)
-        eff = [eff_map[d] for d in ds]; pk = {}
-        for i, d in enumerate(ds):
-            best = 0.0
-            for t in range(i, i + 8):
-                q = 0.0; jmax = min(t, len(ds) - 1, i); jmin = max(0, t - len(uh) + 1)
-                for j in range(jmin, jmax + 1):
-                    k = t - j
-                    if k < len(uh) and eff[j]: q += eff[j] * uh[k]
-                best = max(best, q)
-            pk[d] = best + forecast.MONTHLY_BASEFLOW[d.month]
-        trig = {d: forecast.forecast_triggers(thresholds, d.month) for d in ds}
-        alerts = [d for d in ds if pk[d] >= trig[d]["watch"]]
-        print(f"case {cs['year']} floor={floor}: season alert days {len(alerts)}", [d.isoformat() for d in alerts][:10])
+    eff_map = cumulative.effective_runoff_series(daily)
+    eff = [eff_map[d] for d in ds]; pk = {}
+    for i, d in enumerate(ds):
+        best = 0.0
+        for t in range(i, i + 8):
+            q = 0.0; jmax = min(t, len(ds) - 1, i); jmin = max(0, t - len(uh) + 1)
+            for j in range(jmin, jmax + 1):
+                k = t - j
+                if k < len(uh) and eff[j]: q += eff[j] * uh[k]
+            best = max(best, q)
+        pk[d] = best + forecast.MONTHLY_BASEFLOW[d.month]
+    trig = {d: forecast.forecast_triggers(thresholds, d.month) for d in ds}
+    alerts = [d for d in ds if pk[d] >= trig[d]["watch"]]
+    print(f"case {cs['year']}: season alert days {len(alerts)}", [d.isoformat() for d in alerts][:10])

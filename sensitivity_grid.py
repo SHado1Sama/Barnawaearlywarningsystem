@@ -1,7 +1,8 @@
 """
 Sensitivity of the v3 design settings: spell cap {4, 6, 8} days x dry gap {1, 2} days.
 Uses cumulative.effective_runoff_series' own parameters; same replay scoring as
-replay_v3.py. The cap 6 / gap 1 row must reproduce 68 alert days, 52 false, 4 of 6.
+replay_v3.py. The cap 6 / gap 1 row must reproduce 43 alert days, 27 false, 4 of 6
+(revised fixed-CN design, Addendum 6 of V3_TEST_REPORT.md).
 """
 import sys, os, json
 from datetime import date, timedelta
@@ -57,6 +58,6 @@ def score(eff):
 print(f"{'cap':>4} {'gap':>4} {'alerts':>7} {'false':>6} {'caught':>7}  episodes          occasions false_occasions")
 for cap in (4, 6, 8):
     for gap in (1, 2):
-        eff = cumulative.effective_runoff_series(daily, floor=True, dry_break_days=gap, max_spell_days=cap)
+        eff = cumulative.effective_runoff_series(daily, dry_break_days=gap, max_spell_days=cap)
         a, f, caught, cl, fcl = score(eff)
         print(f"{cap:>4} {gap:>4} {a:>7} {f:>6} {str(len(caught))+'/6':>7}  {','.join(caught):16s} {cl:>9} {fcl:>9}")

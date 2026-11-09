@@ -10,8 +10,11 @@ days; an episode is caught when an alert falls in the 7 days up to
 and including its peak. December warm-up days (20 to 31 of the
 previous year) come from the archive series in both runs; they
 only set soil and spell state on 1 January. Needs ews_data.json
-beside it, like the other replay scripts. See Addendum 5 of
-V3_TEST_REPORT.md for the results and the data checks.
+beside it, like the other replay scripts. Addendum 5 of
+V3_TEST_REPORT.md settled the rainfall and scored the original
+AMC-based supplementary design; Addendum 6 scores the revised
+fixed-CN-II design this script now prints. The v2 figures are
+identical in both addenda.
 """
 import json, os, sys
 from datetime import date, timedelta
@@ -65,7 +68,7 @@ def analyse(daily, year, peak):
             if floor: cls = amc.apply_wet_season_floor(cls, d)
             out[d] = amc.runoff_mm(daily[d], cn[cls])
         return out
-    pk3 = peaks(cumulative.effective_runoff_series(daily, floor=True))
+    pk3 = peaks(cumulative.effective_runoff_series(daily))
     return {"v2_on": score(peaks(eff_v2(True)), WATCH),
             "v3_watch": score(pk3, WATCH), "v3_adv": score(pk3, ADV)}
 
