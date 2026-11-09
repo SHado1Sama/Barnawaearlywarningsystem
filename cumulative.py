@@ -40,8 +40,17 @@ repo): at the Watch trigger it catches 4 of 6 observed flood episodes
 (v2: 2 of 6) at 68 alert days with 52 false alarm days (v2: 12 and 2);
 at the Advisory trigger, the level this card actually signals, it
 catches 5 of 6 (only 2024 missed) at 206 alert days in 31 occasions.
-It still does NOT catch 2024 at any setting tested. It is a
-detection-first experimental variant, not a replacement for v2.
+That replay runs on the archive rainfall series stored in this repo
+(rain_era5_redownload_1990_2025.csv). The six flood years were later
+re-settled on rainfall downloaded directly from the Copernicus
+Climate Data Store (Addendum 5 of the test report): for 1999 to 2014
+the two series agree to within 0.65 mm on any day, but the archive
+series understates 2024 rainfall by about a third, and on the direct
+rainfall both models catch 2024. Across the six flood years on the
+direct rainfall this model catches 6 of 6 at the Advisory trigger
+and 5 of 6 at the Watch trigger (21 false alarm days), and v2 catches
+3 of 6 (3 false alarm days). It is a detection-first experimental
+variant, not a replacement for v2.
 """
 import amc
 
@@ -117,7 +126,10 @@ import forecast
 from datetime import date as _date
 
 # Full 36-year replay validation of this supplementary model (floor on),
-# scored exactly as the primary model: see V3_TEST_REPORT.md.
+# scored exactly as the primary model: see V3_TEST_REPORT.md. The replay
+# runs on the archive rainfall series stored in this repo; the separate
+# flood_years_cds block below re-settles the six flood years on direct
+# Copernicus CDS rainfall.
 REPLAY_STATS = {
     "period": "1990-2025",
     # Occasions are clusters of alert days, split when the gap between
@@ -138,6 +150,23 @@ REPLAY_STATS = {
     "primary_alert_days": 12,
     "primary_false_alarm_days": 2,
     "primary_episodes_caught": 2,
+    # The six flood years re-settled on rainfall downloaded directly
+    # from the Copernicus Climate Data Store (Nov 2026), scored year by
+    # year with the same rules (see flood_years_cds.py and Addendum 5
+    # of V3_TEST_REPORT.md). For 1999-2014 the direct series and the
+    # archive series above agree to within 0.65 mm on any day; the
+    # archive series understates 2024 by about a third, which is why
+    # the episode counts differ from the 36-year replay.
+    "flood_years_cds": {
+        "source": "Copernicus CDS ERA5, direct download",
+        "settled": "2026-11",
+        "years": [1999, 2004, 2008, 2012, 2014, 2024],
+        "episodes_total": 6,
+        "advisory_episodes_caught": 6,
+        "watch_episodes_caught": 5, "watch_missed": "2008",
+        "watch_false_alarm_days": 21,
+        "primary_episodes_caught": 3, "primary_false_alarm_days": 3,
+    },
 }
 
 

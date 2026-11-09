@@ -240,3 +240,74 @@ The handbook applies the procedure within a single storm; extending
 it across the days of a wet spell, and the 6-day cap and 1-day dry
 break, are this project's own heuristics, and the code and README
 now say so.
+
+## Addendum 5, 9 Nov 2026: the flood years re-settled on direct Copernicus CDS rainfall
+
+Why: the 36-year replay in this report runs on the archive rainfall
+series stored in this repo (rain_era5_redownload_1990_2025.csv, an
+Open-Meteo historical product labelled ERA5). Its most surprising
+result, that neither model catches the 2024 episode, was challenged
+by the owner, and a direct comparison was run against rainfall
+downloaded from the Copernicus Climate Data Store itself (ERA5
+hourly total precipitation, same catchment box, daily totals on
+Africa/Lagos days). The comparison showed the archive series
+understates July 2024 rainfall over the catchment by about a third
+(160 mm against 281 mm for the month), so the six flood years were
+re-settled year by year on the direct rainfall
+(rain_cds_flood_years.csv, scored by flood_years_cds.py with the
+same rules as the replay: Watch and Advisory triggers, an alert day
+verified when the observed flow reaches the scored level within the
+following 7 days, an episode caught when an alert falls in the
+7 days up to and including its peak; December warm-up days taken
+from the archive series, which only sets soil and spell state on
+1 January, months before the flood season).
+
+Checks on the direct data: the August 2012 month was downloaded
+twice, in a monthly job and inside the full-year job, and the two
+extractions agree on every August day; 24 Aug 2012 reads 96.2 mm
+with 30.7 mm in the prior 5 days, matching the values the owner's
+original CDS script produced for that storm (about 97 to 100 mm and
+26 to 31 mm). The full-year 2024 file also reproduces the earlier
+July to September 2024 extraction to within 0.001 mm per day.
+
+The headline finding is about the data, not the models. For 1999,
+2004, 2008, 2012 and 2014 the direct series and the archive series
+agree almost exactly (daily correlation 0.9997 to 0.9998, largest
+single-day difference 0.63 mm), so the replay scores for those
+years barely move. 2024 is the lone anomaly: correlation 0.69, and
+the archive year total is 736.0 mm against the direct 984.3 mm.
+
+Settled scores on the direct rainfall, per flood year (v2 with the
+wet-season floor on; v3 at the Watch trigger):
+
+- 1999 (peak 29 Jul): v2 no alerts, missed. v3 caught, lead 2 days,
+  4 alert days, 1 false.
+- 2004 (peak 24 Aug): v2 caught, lead 2, 7 alert days, 1 false.
+  v3 caught, lead 2, 8 alert days, 2 false.
+- 2008 (peak 21 Aug): v2 no alerts, missed. v3 at Watch missed
+  (9 alert days, all 9 scored false, raised away from the peak
+  window); v3 at Advisory caught.
+- 2012 (peak 27 Aug): v2 caught, lead 3, 5 alert days, 1 false;
+  with the floor off v2 raises no alerts at all, so the wet-season
+  floor is still required on the direct rainfall. v3 caught,
+  lead 3, 6 alert days, 2 false.
+- 2014 (peak 15 Aug): v2 no alerts, missed. v3 caught, lead 2,
+  8 alert days in 2 occasions, 4 false.
+- 2024 (peak 23 Jul): v2 caught, lead 3, 5 alert days, 1 false
+  (24 Jul, the trailing edge of the event). v3 caught, lead 3,
+  7 alert days in 1 occasion, 3 false. On the archive rainfall
+  both models raise zero alert days in 2024 and miss the episode.
+
+Totals across the six flood years on the direct rainfall: v2
+catches 3 of 6 with 3 false alarm days; v3 catches 5 of 6 at the
+Watch trigger with 21 false alarm days, and 6 of 6 at the Advisory
+trigger it is displayed at. On the archive rainfall the same six
+years score v2 2 of 6 and v3 4 of 6 at Watch, the entire
+difference being 2024.
+
+Bottom line, unchanged in structure and now settled on the data:
+the primary model's value is its near-clean record, the
+supplementary model's value is its catch rate at the Advisory
+level, and the dashboard arrangement (v2 primary, v3 supplementary
+advisory only) stands. Any detection rate quoted from this project
+should name its rainfall source.

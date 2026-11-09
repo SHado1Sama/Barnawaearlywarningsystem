@@ -100,26 +100,42 @@ The dashboard runs two rainfall-driven forecasts side by side:
   wet spell, and the 6-day cap and 1-day dry break below, are this
   project's own heuristics), with spells capped at 6 days. Its record
   depends on the level it is scored at, and the dashboard prints the
-  record for the level it signals. At the Advisory trigger, the level
-  the card signals: 206 alert days in 31 occasions (about once a year,
-  a signal in 19 of 36 years, mostly in August), preceding 5 of 6
-  episodes (1999, 2004, 2008, 2012, 2014; only 2024 missed); the river
-  went on to reach the Advisory flow (1,358 m3/s) after 13 of the 31
-  occasions, and on 10 of the other 18 it still rose to between 1,000
-  and 1,358 m3/s. At the higher Watch trigger it is rarer and sharper:
-  68 alert days, 52 false alarm days, 14 occasions, 4 of 6 episodes
-  caught (it misses 2008 there as well as 2024), a flood following on
-  4 occasions and not on 10. (Occasions are clusters of alert days,
-  split when the gap between alert days exceeds 2 days.) The settings are not magic: across spell caps of
+  record for the level it signals. The long record below comes from
+  the 36-year replay on the archive rainfall series stored in this
+  repo (rain_era5_redownload_1990_2025.csv). At the Advisory trigger,
+  the level the card signals: 206 alert days in 31 occasions (about
+  once a year, a signal in 19 of 36 years, mostly in August),
+  preceding 5 of 6 episodes (1999, 2004, 2008, 2012, 2014; only 2024
+  missed); the river went on to reach the Advisory flow (1,358 m3/s)
+  after 13 of the 31 occasions, and on 10 of the other 18 it still
+  rose to between 1,000 and 1,358 m3/s. At the higher Watch trigger
+  it is rarer and sharper: 68 alert days, 52 false alarm days, 14
+  occasions, 4 of 6 episodes caught (it misses 2008 there as well as
+  2024), a flood following on 4 occasions and not on 10. (Occasions
+  are clusters of alert days, split when the gap between alert days
+  exceeds 2 days.)
+  The six flood years were re-settled in November 2026 on rainfall
+  downloaded directly from the Copernicus Climate Data Store
+  (rain_cds_flood_years.csv, flood_years_cds.py, Addendum 5 of the
+  test report). For 1999 to 2014 the direct series and the archive
+  series agree to within 0.65 mm on any day, but the archive series
+  understates 2024 rainfall by about a third (736 mm against 984 mm
+  for the year), which is why the replay missed that episode. On the
+  direct rainfall, across the six flood years: this model precedes
+  all 6 episodes at the Advisory trigger and 5 of 6 at the Watch
+  trigger (missing 2008, 21 false alarm days), the primary model
+  precedes 3 of 6 (2004, 2012, 2024, 3 false alarm days), and both
+  models catch 2024 with 3 days of lead. The settings are not magic: across spell caps of
   4, 6 and 8 days and dry gaps of 1 and 2 days it catches 2, 4 and 5 of 6
   with false days rising alongside (26, 52, 100 at gap 1), so 6 days and
   1 day is a middle point on a smooth trade, and at cap 6 the 2014 catch
   depends on the 1-day gap. It catches more floods but cries wolf far too often
   to issue warnings, so on the dashboard it can only ever show an
   **Advisory**: it never raises the headline level. Treat its signal as a
-  prompt to watch the river, not as a warning. Neither model catches the
-  2024 episode on this rainfall; see the replay notes in the project
-  record before quoting detection rates.
+  prompt to watch the river, not as a warning. On the archive rainfall
+  neither model catches the 2024 episode; on the direct Copernicus
+  rainfall both do, so quote detection rates with their rainfall
+  source attached; see the replay notes in the project record.
 
 Checks: `python test_amc.py` for the primary model's soil and forecast
 logic, `python test_cumulative.py` for the supplementary model.
