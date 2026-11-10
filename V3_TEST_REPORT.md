@@ -445,3 +445,55 @@ separate flood_years_cds entry. replay_v3.py and
 sensitivity_grid.py now read the corrected file, and
 daily_replay_v3.csv is regenerated from it (50 alert days,
 20 verified, 30 false at the Watch trigger).
+
+## Addendum 8, 10 Nov 2026: the 2025 correction adopted
+
+Addendum 7's corrected series replaced only 2024. The direct
+Copernicus download for 2025 was already held (annual 1,047.5 mm
+against the archive series' 787.4 mm, an understatement of about
+a third, the same failure as 2024), and on 10 Nov 2026 the user
+adopted it into the series: rain_corrected_1990_2025.csv now
+carries direct-download rainfall for 2024 and 2025, and is
+identical to the archive series on every other day (mean annual
+930.7 mm). Both models were re-scored with the settled rules;
+the scoring harness first reproduced the Addendum 7 record
+exactly on the previous series.
+
+Result: the primary model is untouched. It raises no alert
+anywhere in 2025 on either series, so its record stands at
+17 alert days, 3 false days (all trailing caught floods),
+3 occasions, no false occasions, 3 of 6 caught (2004, 2012,
+2024; leads 2, 3, 3 days).
+
+The supplementary model's catches are unchanged but its false
+alarms rise, because the true 2025 was much wetter than the
+archive showed. At the Watch trigger: 55 alert days (was 50),
+35 false days (was 30), 11 occasions (was 10), 6 false occasions
+(was 5); still 5 of 6 caught, missing 2008, same leads. The five
+new alert days form one occasion, 15 to 19 August 2025. At the
+Advisory trigger: 133 alert days (was 122), 24 occasions (was
+22), 12 followed by Advisory-level flow (unchanged), 12 not
+followed (was 10), on 6 of which the river still rose above
+1,000 m3/s (was 4); a signal now occurs in 19 of 36 years
+(was 18), mostly in August. The two new Advisory occasions are
+15 to 20 August and 9 to 13 September 2025. Both centre on
+spells in which the river peaked at 1,220 m3/s (18 August 2025,
+the year's maximum): 90 percent of the Advisory flow but only
+66 percent of Watch, so they are near misses in character and
+false alarms under the counting rules.
+
+Sensitivity on the updated series (sensitivity_grid.py), Watch
+trigger: cap 4 catches 3 of 6 with 15 false days at gap 1 (9 at
+gap 2); cap 6 catches 5 of 6 with 35 false at gap 1 and 4 of 6
+with 46 at gap 2; cap 8 catches 5 of 6 with 68 false at gap 1
+(107 at gap 2). Cap 6 with gap 1 keeps the joint-best catch with
+the fewest false days, so the design point stands a third time.
+
+Presentation: cumulative.py's REPLAY_STATS, the dashboard card's
+rainfall note (now "2024 and 2025"), the README record and
+daily_replay_v3.csv (55 alert days, 20 verified, 35 false at the
+Watch trigger) are updated to this record. The printed record
+now rests on direct-download rainfall for both years in which
+the archive series is known to fail; the years 2015 to 2023
+remain unchecked against direct downloads, and any alert days
+there should be read with that caveat.

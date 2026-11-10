@@ -3,8 +3,9 @@
 Scores the revised design of 9 Nov 2026 (curve number fixed at CN II, no AMC
 classes, no wet-season floor; see Addendum 6 of V3_TEST_REPORT.md) on the
 corrected rainfall series (rain_corrected_1990_2025.csv: the archive
-re-download with 2024 replaced by the direct Copernicus CDS series;
-Addendum 7). The original design's replay figures are preserved in the report.
+re-download with 2024 and 2025 replaced by the direct Copernicus CDS
+series; Addenda 7 and 8). The original design's replay figures are
+preserved in the report.
 """
 import json, os, sys
 from datetime import date, timedelta

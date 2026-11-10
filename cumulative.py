@@ -43,18 +43,19 @@ baseflow-aware triggers, classification.
 
 Honest status, from the full 36-year test (V3_TEST_REPORT.md in this
 repo): at the Watch trigger it catches 5 of 6 observed flood
-episodes (v2: 3 of 6) at 50 alert days with 30 false alarm days
+episodes (v2: 3 of 6) at 55 alert days with 35 false alarm days
 (v2: 17 and 3); at the Advisory trigger, the level this card
-actually signals, it catches 6 of 6 at 122 alert days in 22
+actually signals, it catches 6 of 6 at 133 alert days in 24
 occasions. The replay runs on the corrected rainfall series stored
 in this repo (rain_corrected_1990_2025.csv): the archive
-re-download series with 2024 replaced by rainfall downloaded
-directly from the Copernicus Climate Data Store, after the archive
-series was found to understate 2024 by about a third (Addenda 5
-to 7 of the test report). For 1999 to 2014 the direct and archive
-series agree to within 0.65 mm on any day, so 2024 was the only
-year replaced. It is a detection-first experimental variant, not
-a replacement for v2.
+re-download series with 2024 and 2025 replaced by rainfall
+downloaded directly from the Copernicus Climate Data Store, after
+the archive series was found to understate both years by about a
+third (Addenda 5 to 8 of the test report). For 1999 to 2014 the
+direct and archive series agree to within 0.65 mm on any day;
+2025 was adopted on 10 Nov 2026 (Addendum 8) and added false
+occasions to this model's record only. It is a detection-first
+experimental variant, not a replacement for v2.
 """
 import amc
 
@@ -129,22 +130,22 @@ from datetime import date as _date
 # Full 36-year replay validation of this supplementary model,
 # scored exactly as the primary model: see V3_TEST_REPORT.md. The
 # replay runs on the corrected rainfall series stored in this repo
-# (rain_corrected_1990_2025.csv; Addendum 7 of the test report).
+# (rain_corrected_1990_2025.csv; Addenda 7 and 8 of the test report).
 REPLAY_STATS = {
     "period": "1990-2025",
     # Occasions are clusters of alert days, split when the gap between
     # alert days exceeds 2 days.
     "watch_tier": {
-        "alert_days": 50, "false_alarm_days": 30,
-        "occasions": 10, "occasions_flood_followed": 5, "occasions_no_flood": 5,
+        "alert_days": 55, "false_alarm_days": 35,
+        "occasions": 11, "occasions_flood_followed": 5, "occasions_no_flood": 6,
         "episodes_caught": 5, "episodes_total": 6, "missed": "2008",
     },
     "advisory_tier": {
-        "alert_days": 122, "occasions": 22,
-        "years_with_signal": 18, "mostly_month": "August",
+        "alert_days": 133, "occasions": 24,
+        "years_with_signal": 19, "mostly_month": "August",
         "episodes_caught": 6, "episodes_total": 6, "missed": "",
         "occasions_followed_by_advisory_flow": 12,
-        "occasions_below_advisory": 10, "of_those_rose_1000_to_advisory": 4,
+        "occasions_below_advisory": 12, "of_those_rose_1000_to_advisory": 6,
         "advisory_flow_m3s": 1357.7,
     },
     "primary_alert_days": 17,
@@ -182,7 +183,7 @@ def live_model_v3(full_series, now_str, thresholds, advisory_discharge):
     the dashboard headline level (that stays with the river reading and the
     primary forecast in forecast.live_model). It exists because in the
     36-year replay it caught 5 of 6 flood episodes against the primary
-    model's 3 of 6, but with 30 false alarm days against the primary's 3
+    model's 3 of 6, but with 35 false alarm days against the primary's 3
     at the Watch trigger, so its signals are shown as Advisory, not Watch.
     The card prints the record for the Advisory trigger it signals at,
     with the Watch-trigger record as a secondary line.

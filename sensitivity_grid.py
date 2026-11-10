@@ -1,7 +1,7 @@
 """
 Sensitivity of the v3 design settings: spell cap {4, 6, 8} days x dry gap {1, 2} days.
 Uses cumulative.effective_runoff_series' own parameters; same replay scoring as
-replay_v3.py. The cap 6 / gap 1 row must reproduce 50 alert days, 30 false, 5 of 6
+replay_v3.py. The cap 6 / gap 1 row must reproduce 55 alert days, 35 false, 5 of 6
 (revised fixed-CN design on the corrected rainfall series, Addenda 6
 and 7 of V3_TEST_REPORT.md).
 """

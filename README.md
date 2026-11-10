@@ -82,9 +82,9 @@ The dashboard runs two rainfall-driven forecasts side by side:
   wet-season floor above. On the full 36-year replay (rainfall file
   rain_corrected_1990_2025.csv, box-averaged ERA5, scored against
   the observed record; that file is the re-download fetched in Nov 2026
-  with 2024 replaced by a direct Copernicus download, the archive
-  version having understated that year by about a third; it is not
-  the original rainfall file used in the defended project report):
+  with 2024 and 2025 replaced by direct Copernicus downloads, the
+  archive version having understated both years by about a third; it
+  is not the original rainfall file used in the defended project report):
   17 alert days, 3 false alarm days (all trailing a real flood), and 3 of
   the 6 flood episodes caught (2004, 2012, 2024). It is conservative and
   rarely wrong, but it misses floods that build from many moderate rain
@@ -112,31 +112,37 @@ The dashboard runs two rainfall-driven forecasts side by side:
   record for the level it signals. The long record below comes from
   the 36-year replay on the corrected rainfall series stored in this
   repo (rain_corrected_1990_2025.csv). At the Advisory trigger,
-  the level the card signals: 122 alert days in 22 occasions (a
-  signal in 18 of 36 years, mostly in August),
+  the level the card signals: 133 alert days in 24 occasions (a
+  signal in 19 of 36 years, mostly in August),
   preceding all 6 episodes; the river went on to reach the Advisory
   flow (1,358 m3/s)
-  after 12 of the 22 occasions, and on 4 of the other 10 it still
+  after 12 of the 24 occasions, and on 6 of the other 12 it still
   rose to between 1,000 and 1,358 m3/s. At the higher Watch trigger
-  it is rarer and sharper: 50 alert days, 30 false alarm days, 10
+  it is rarer and sharper: 55 alert days, 35 false alarm days, 11
   occasions, 5 of 6 episodes caught (it misses only 2008 there),
-  a flood following on 5 occasions and not on 5. (Occasions
+  a flood following on 5 occasions and not on 6. (Occasions
   are clusters of alert days, split when the gap between alert days
   exceeds 2 days.)
   The rainfall behind both records is rain_corrected_1990_2025.csv:
-  the November 2026 re-download series with 2024 replaced by the
-  direct Copernicus series (the per-year settling is in
-  rain_cds_flood_years.csv and flood_years_cds.py; Addenda 5 to 7 of
+  the November 2026 re-download series with 2024 and 2025 replaced
+  by the direct Copernicus series (the per-year settling is in
+  rain_cds_flood_years.csv and flood_years_cds.py; Addenda 5 to 8 of
   the test report). The direct and archive series agree to within
   0.65 mm on any day for 1999 to 2014, but the archive series
-  understates 2024 by about a third (736 mm against 984 mm for the
-  year), which is why the original replay missed that episode; with
-  2024 corrected, both models catch it with 3 days of lead. The
+  understates 2024 and 2025 by about a third (736 mm against 984 mm
+  for 2024, 787 mm against 1,048 mm for 2025), which is why the
+  original replay missed the 2024 episode; with 2024 corrected,
+  both models catch it with 3 days of lead. The wetter corrected
+  2025 (adopted 10 Nov 2026, Addendum 8) leaves the primary record
+  unchanged and adds false occasions to the supplementary record
+  only: one at Watch (15 to 19 August 2025) and two at Advisory,
+  both around spells in which the river peaked at 1,220 m3/s, its
+  highest flow of 2025. The
   settings are not magic: across spell caps of
   4, 6 and 8 days at the 1-day dry gap the supplementary model
   catches 3, 5 and 5 of 6 with false days rising alongside
-  (15, 30, 68), and the 2-day gap at cap 6 catches fewer (4 of 6)
-  with more false days (41), so cap 6 with gap 1 keeps the best
+  (15, 35, 68), and the 2-day gap at cap 6 catches fewer (4 of 6)
+  with more false days (46), so cap 6 with gap 1 keeps the best
   catch with the fewest false days. It catches more floods but cries wolf far too often
   to issue warnings, so on the dashboard it can only ever show an
   **Advisory**: it never raises the headline level. Treat its signal as a
